@@ -51,7 +51,7 @@ subroutine react(nspec, Xin, T, rho, tmax, Xout, enucdot)
         call rhs(rho, T, X2, dX2dt)
         
         do m = 1, nspec
-           dfdX = (dX2dt(m) - dX1dt(m))/(X2(n) - X1(n))
+           dfdX = 0.5d0*(dX2dt(m) - dX1dt(m))/(X2(n) - X1(n))
            J(m,n) = dfdX
         enddo
      enddo
