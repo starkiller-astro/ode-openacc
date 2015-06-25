@@ -15,7 +15,7 @@ subroutine react(nspec, Xin, T, rho, tmax, Xout, enucdot)
   integer :: m, n
   
   double precision, dimension(nspec), intent(in) :: Xin
-  double precision, dimension(nspeC), intent(out) :: Xout
+  double precision, dimension(nspec), intent(out) :: Xout
   double precision, intent(in) :: T, rho, tmax
   double precision, intent(out) :: enucdot
 
@@ -23,11 +23,13 @@ subroutine react(nspec, Xin, T, rho, tmax, Xout, enucdot)
   
   double precision :: dXdt(nspec)
   double precision :: X1(nspec), X2(nspec), dX1dt(nspec), dX2dt(nspec)
-  double precision :: A(nspec, nspec), J(nspec, nspec)
+  double precision :: A(nspec, nspec), J(nspec, nspec), b(nspec)
   double precision :: dfdX
+  integer :: info
   
   double precision, parameter :: eps = 1.d-8
-  
+
+  integer :: ipiv(nspec)
 
   ! get an estimate of the timestep by looking at the RHS
   ! dt = min{X/(dX/dt)}
@@ -38,6 +40,8 @@ subroutine react(nspec, Xin, T, rho, tmax, Xout, enucdot)
      dt = min(dt, Xin(n)/dXdt(n))
   enddo
 
+  Xout(:) = xin(:)
+  
   ! do the integration
   time = 0.0d0
   do while (time < tmax)
@@ -49,11 +53,11 @@ subroutine react(nspec, Xin, T, rho, tmax, Xout, enucdot)
 
      ! J_{m,n} = df_m/dX_n
      do n = 1, nspec
-        X1(:) = Xin(:)
+        X1(:) = Xout(:)
         X1(n) = X1(n) + eps
 
-        X2(:) = Xin(:)
-        X2(n) = Xin(n) - eps
+        X2(:) = Xout(:)
+        X2(n) = X2(n) - eps
 
         call rhs(rho, T, X1, dX1dt)
         call rhs(rho, T, X2, dX2dt)
@@ -76,13 +80,18 @@ subroutine react(nspec, Xin, T, rho, tmax, Xout, enucdot)
            
            A(m,n) = I - dt*J(m,n)
         enddo
+
+        b(n) = xout(n)
      enddo
      
      ! solve the linear system -- we'll just use Lapack.  Note that the
      ! input X is overwritten on output
+     call dgesv(nspec, 1, A, nspec, ipiv, b, nspec, info)
 
-
-     
+     do n = 1, nspec
+        xout(n) = b(n)
+     enddo
+          
      if (time + dt > tmax) then
         dt = tmax - time
      endif
