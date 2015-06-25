@@ -11,13 +11,21 @@ subroutine react(nspec, Xin, T, rho, tmax, Xout, enucdot)
   ! this version works on a single-zone only
 
   integer :: nspec
+
+  integer :: m, n
+  
   double precision, dimension(nspec), intent(in) :: Xin
   double precision, dimension(nspeC), intent(out) :: Xout
   double precision, intent(in) :: T, rho, tmax
   double precision, intent(out) :: enucdot
 
-  double precision :: J(nspec, nspec)
-
+  double precision :: time, dt, I
+  
+  double precision :: dXdt(nspec)
+  double precision :: X1(nspec), X2(nspec), dX1dt(nspec), dX2dt(nspec)
+  double precision :: A(nspec, nspec), J(nspec, nspec)
+  double precision :: dfdX
+  
   double precision, parameter :: eps = 1.d-8
   
 
@@ -31,8 +39,8 @@ subroutine react(nspec, Xin, T, rho, tmax, Xout, enucdot)
   enddo
 
   ! do the integration
-  t = 0.0d0
-  do while (t < tmax)
+  time = 0.0d0
+  do while (time < tmax)
 
      ! construct a numerical Jacobian via simple differencing
      ! Lapack matrix ordering is described here:
@@ -75,11 +83,11 @@ subroutine react(nspec, Xin, T, rho, tmax, Xout, enucdot)
 
 
      
-     if (t + dt > tmax) then
-        dt = tmax - t
+     if (time + dt > tmax) then
+        dt = tmax - time
      endif
 
-     t = t + dt
+     time = time + dt
   enddo
 
 

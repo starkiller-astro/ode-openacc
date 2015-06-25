@@ -19,8 +19,8 @@ odir := _build
 
 
 # source files
-F90SOURCES := $(foreach dir, $(SRC_DIRS), $(wildcard $(dir)/*.f90))
-FSOURCES := $(foreach dir, $(SRC_DIRS), $(wildcard $(dir)/*.f))
+F90SOURCES := $(foreach dir, $(SRC_DIRS), $(notdir $(wildcard $(dir)/*.f90)))
+FSOURCES := $(foreach dir, $(SRC_DIRS), $(notdir $(wildcard $(dir)/*.f)))
 
 
 # dependencies
