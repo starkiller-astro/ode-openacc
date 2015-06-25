@@ -7,7 +7,7 @@ FSOURCE :=
 
 ALL: test_react
 
-SRC_DIRS := . ../lapack/
+SRC_DIRS := . ../lapack/ ../blas/
 
 # vpath is the list of directories to search for source files.  
 vpath %.f90 $(SRC_DIRS)
