@@ -26,7 +26,7 @@ FSOURCES := $(foreach dir, $(SRC_DIRS), $(notdir $(wildcard $(dir)/*.f)))
 # dependencies
 $(odir)/deps: $(F90SOURCES)
 	@if [ ! -d $(odir) ]; then mkdir -p $(odir); fi
-	./dep.py --prefix $(odir) $(F90SOURCES) > $(odir)/deps
+	../util/dep.py --prefix $(odir) $(F90SOURCES) > $(odir)/deps
 
 include $(odir)/deps
 
