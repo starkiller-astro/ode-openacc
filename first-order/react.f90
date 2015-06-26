@@ -1,4 +1,6 @@
-subroutine react(nspec, Xin, T, rho, tmax, Xout, enucdot)
+subroutine react(Xin, T, rho, tmax, Xout, enucdot)
+
+  use network
 
   implicit none
 
@@ -10,17 +12,15 @@ subroutine react(nspec, Xin, T, rho, tmax, Xout, enucdot)
 
   ! this version works on a single-zone only
 
-  integer :: nspec
-
-  integer :: m, n
-  
   double precision, dimension(nspec), intent(in) :: Xin
   double precision, dimension(nspec), intent(out) :: Xout
   double precision, intent(in) :: T, rho, tmax
   double precision, intent(out) :: enucdot
 
   double precision :: time, dt, I
-  
+
+  integer :: m, n
+    
   double precision :: dXdt(nspec)
   double precision :: X1(nspec), X2(nspec), dX1dt(nspec), dX2dt(nspec)
   double precision :: A(nspec, nspec), J(nspec, nspec), b(nspec)
