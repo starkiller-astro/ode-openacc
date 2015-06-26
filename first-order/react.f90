@@ -1,6 +1,7 @@
 subroutine react(Xin, T, rho, tmax, Xout, enucdot)
 
   use network
+  use rpar_indices
 
   implicit none
 
@@ -29,16 +30,29 @@ subroutine react(Xin, T, rho, tmax, Xout, enucdot)
   
   double precision, parameter :: eps = 1.d-8
 
+  double precision :: rpar(n_rpar_comps)
+  integer :: ipar
+
   integer :: ipiv(nspec)
+
+  integer :: ic12, io16
+
+  ic12 = network_species_index("carbon-12")
+  io16 = network_species_index("oxygen-16")
 
   ! get an estimate of the timestep by looking at the RHS
   ! dt = min{X/(dX/dt)}
-  call rhs(rho, T, Xin, dXdt)
+  rpar(irp_dens) = rho
+  rpar(irp_temp) = T
+  rpar(irp_o16) = Xin(io16)
+
+  call rhs(nspec, 0.0d0, Xin, dXdt, rpar, ipar)
+  print *, dXdt
 
   dt = 1.d33
-  do n = 1, nspec
-     dt = min(dt, Xin(n)/dXdt(n))
-  enddo
+  dt = min(dt, abs(Xin(ic12)/dXdt(ic12)))
+
+  print *, "dt = ", dt
 
   Xout(:) = xin(:)
   
@@ -59,8 +73,8 @@ subroutine react(Xin, T, rho, tmax, Xout, enucdot)
         X2(:) = Xout(:)
         X2(n) = X2(n) - eps
 
-        call rhs(rho, T, X1, dX1dt)
-        call rhs(rho, T, X2, dX2dt)
+        call rhs(nspec, 0.0d0, X1, dX1dt, rpar, ipar)
+        call rhs(nspec, 0.0d0, X2, dX2dt, rpar, ipar)
         
         do m = 1, nspec
            dfdX = 0.5d0*(dX2dt(m) - dX1dt(m))/(X2(n) - X1(n))

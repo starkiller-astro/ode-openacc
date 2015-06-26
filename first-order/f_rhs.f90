@@ -105,6 +105,8 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
 
   xc12tmp = max(y(ic12_),0.d0)
   ydot(ic12_) = -one_twelvth*dens*sc1212*rate*xc12tmp**2
+  ydot(io16_) = 0.0d0
+  ydot(img24_) = -ydot(ic12_)
 
   return
 

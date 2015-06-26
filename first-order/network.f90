@@ -79,7 +79,6 @@ contains
     ! sense of what is stored in the rpar() array.
     call init_rpar_indices(nspec)
 
-
     network_initialized = .true.
 
   end subroutine network_init
