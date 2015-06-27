@@ -9,3 +9,12 @@ See
 https://software.intel.com/sites/products/documentation/doclib/mkl_sa/11/mkl_lapack_examples/dgesv_ex.f.htm
 
 for a dgesv example
+
+
+
+---
+
+norm:  blas level-1: dnrm2
+
+maxtrix vector multiply: blas level-2: dgemv
+
