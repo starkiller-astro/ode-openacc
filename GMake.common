@@ -31,7 +31,7 @@ ifeq ($(FC),gfortran)
   wrapper := $(FC)
 
 else ifeq ($(FC),pgf95)
-  FFLAGS := -c -fast -acc -module $(odir) -I$(odir)
+  FFLAGS := -c -fast -acc -module $(odir) -I$(odir) -Minfo=all
   wrapper := ftn
 
 else
