@@ -1,4 +1,4 @@
-FC := gfortran
+FC := pgf95
 
 ALL: test_react
 
