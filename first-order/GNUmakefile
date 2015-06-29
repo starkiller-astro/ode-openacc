@@ -1,63 +1,10 @@
 FC := gfortran
 
-FSOURCE := 
-
-# basic rules for building the source.  Problems are built in
-# sub-directories.  Some make tricks taken from BoxLib (CCSE/LBNL).
-
 ALL: test_react
 
 SRC_DIRS := . ../lapack/ ../blas/
 
-# vpath is the list of directories to search for source files.  
-vpath %.f90 $(SRC_DIRS)
-vpath %.f $(SRC_DIRS)
-
-
-# odir is the directory where we put the .o and .mod files as we build
-odir := _build
-
-
-# source files
-F90SOURCES := $(foreach dir, $(SRC_DIRS), $(notdir $(wildcard $(dir)/*.f90)))
-FSOURCES := $(foreach dir, $(SRC_DIRS), $(notdir $(wildcard $(dir)/*.f)))
-
-
-# dependencies
-$(odir)/deps: $(F90SOURCES)
-	@if [ ! -d $(odir) ]; then mkdir -p $(odir); fi
-	../util/dep.py --prefix $(odir)/ $(F90SOURCES) > $(odir)/deps
-
-include $(odir)/deps
-
-
-
-# set the compiler flags for those compilers we know about
-ifeq ($(FC),gfortran)
-  FFLAGS := -c -O2 -g -fbounds-check -fbacktrace -Wuninitialized -Wunused -ffpe-trap=invalid -finit-real=nan
-  FFLAGS += -J $(odir) -I $(odir)
-
-else ifeq ($(FC),mycomp)
-  $(info mycomp stuff goes here)
-
-else
-  $(error ERROR: compiler $(FC) invalid)
-endif
-
-
-# default rule for building the object files
-$(odir)/%.o: %.f90
-	@if [ ! -d $(odir) ]; then mkdir -p $(odir); fi
-	$(FC) $(FFLAGS) -o $@ $< 
-
-$(odir)/%.o: %.f
-	@if [ ! -d $(odir) ]; then mkdir -p $(odir); fi
-	$(FC) $(FFLAGS) -o $@ $< 
-
-
-# create the list of dependencies for the final build (all the .o files)
-OBJECTS := $(addprefix $(odir)/, $(F90SOURCES:.f90=.o))
-OBJECTS += $(addprefix $(odir)/, $(FSOURCES:.f=.o))
+include ../GMake.common
 
 
 # default target -- this is the executable
@@ -66,17 +13,3 @@ test_react: $(OBJECTS)
 	@echo "Linking..."
 	gfortran -o test_react $(OBJECTS)
 
-
-.PHONY: clean
-
-
-# targets for cleaning up
-clean:
-	rm -f $(odir)/*.o $(odir)/*.mod
-
-realclean: clean
-	rm -f $(odir)/deps
-	@if [ -d $(odir) ]; then rmdir $(odir); echo "removing $(odir)"; fi
-	rm -f test_react
-
-print-%: ; @echo $* is $($*)
