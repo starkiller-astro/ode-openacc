@@ -1,11 +1,7 @@
-! The f_rhs routine provides the right-hand-side for the DVODE solver.  It 
-! converts the mass fractions into molar abundances before calling the 
-! make_rates, screen, and dydt routines.  It also checks to see if the 
-! temperature has changed much since the last call - if so, it updates the 
-! temperature to get a better estimate of the reaction rates.
+! Note: we expect the input to be mass fractions -- this is different
+! than the version in Maestro.  We convert to molar fractions here.
 !
-! The jac routine provides an explicit Jacobian to the DVODE solver.
-!
+! Y = X/A
 
 subroutine rhs(n, t, y, ydot, rpar, ipar)
 
@@ -35,7 +31,7 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
   dens = rpar(irp_dens)
   t9 = rpar(irp_temp)*T2T9
 
-  ymol = y(1:nspec)
+  ymol = y(1:nspec)/aion(1:nspec)
 
 
   ! build the rates; weak rates are the wk* variables
@@ -43,6 +39,10 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
 
   ! set up the ODEs
   call make_ydots(ymol,t9,rpar,ydot(1:nspec),.false.)
+
+  ! make them in terms of mass fractions
+  ! dX/dt = dX/dY dY/dt
+  ydot(1:nspec) = aion(1:nspec)*ydot(1:nspec)
 
   return
 

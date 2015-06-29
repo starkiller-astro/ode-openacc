@@ -36,7 +36,7 @@ subroutine react(Xin, T, rho, tmax, Xout, enucdot)
   integer :: ipiv(nspec)
 
   double precision, parameter :: tol = 1.d-4
-  integer, parameter :: max_iter = 10
+  integer, parameter :: max_iter = 20
   integer :: iter
   logical :: converged
   
@@ -50,7 +50,7 @@ subroutine react(Xin, T, rho, tmax, Xout, enucdot)
   print *, dXdt
 
   dt = 1.d33
-  dt = 0.1*min(dt, abs(Xin(ih1)/dXdt(ih1)))
+  dt = 0.01*min(dt, abs(Xin(ih1)/dXdt(ih1)))
 
   print *, "dt = ", dt
 
