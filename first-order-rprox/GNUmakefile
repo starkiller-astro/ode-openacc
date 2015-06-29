@@ -1,4 +1,5 @@
-FC := gfortran
+#FC := gfortran
+FC := pgf95
 
 ALL: test_react
 
@@ -11,5 +12,5 @@ include ../GMake.common
 test_react: $(OBJECTS)
 	@echo " "
 	@echo "Linking..."
-	gfortran -o test_react $(OBJECTS)
+	$(wrapper) -o test_react $(OBJECTS)
 

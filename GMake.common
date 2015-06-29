@@ -28,9 +28,11 @@ include $(odir)/deps
 ifeq ($(FC),gfortran)
   FFLAGS := -c -O2 -g -fbounds-check -fbacktrace -Wuninitialized -Wunused -ffpe-trap=invalid -finit-real=nan
   FFLAGS += -J $(odir) -I $(odir)
+  wrapper := $(FC)
 
-else ifeq ($(FC),mycomp)
-  $(info mycomp stuff goes here)
+else ifeq ($(FC),pgf95)
+  FFLAGS := -c -fast -acc -module $(odir) -I$(odir)
+  wrapper := ftn
 
 else
   $(error ERROR: compiler $(FC) invalid)
@@ -40,11 +42,11 @@ endif
 # default rule for building the object files
 $(odir)/%.o: %.f90
 	@if [ ! -d $(odir) ]; then mkdir -p $(odir); fi
-	$(FC) $(FFLAGS) -o $@ $< 
+	$(wrapper) $(FFLAGS) -o $@ $< 
 
 $(odir)/%.o: %.f
 	@if [ ! -d $(odir) ]; then mkdir -p $(odir); fi
-	$(FC) $(FFLAGS) -o $@ $< 
+	$(wrapper) $(FFLAGS) -o $@ $< 
 
 
 # create the list of dependencies for the final build (all the .o files)
