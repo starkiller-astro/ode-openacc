@@ -1,0 +1,15 @@
+FC := gfortran
+
+ALL: test_react
+
+SRC_DIRS := . ../lapack/ ../blas/
+
+include ../GMake.common
+
+
+# default target -- this is the executable
+test_react: $(OBJECTS)
+	@echo " "
+	@echo "Linking..."
+	gfortran -o test_react $(OBJECTS)
+
