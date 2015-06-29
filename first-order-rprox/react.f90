@@ -35,7 +35,7 @@ subroutine react(Xin, T, rho, tmax, Xout, enucdot)
 
   integer :: ipiv(nspec)
 
-  double precision, parameter :: tol = 1.d-6
+  double precision, parameter :: tol = 1.d-4
   integer, parameter :: max_iter = 10
   integer :: iter
   logical :: converged
@@ -118,7 +118,7 @@ subroutine react(Xin, T, rho, tmax, Xout, enucdot)
         X_np1(:) = X_np1(:) + dX(:)
         
         ! compare to see if we converged
-        if (abs(dX(1)) < tol*X_n(1)) then
+        if (abs(dX(ih1)) < tol*X_n(ih1)) then
            converged = .true.
            exit
         endif
@@ -126,6 +126,7 @@ subroutine react(Xin, T, rho, tmax, Xout, enucdot)
      enddo   ! dX iteration loop
 
      if (.not. converged) then
+        print *, abs(dx(ih1)), X_n(ih1), abs(dx(ih1))/X_n(ih1)
         stop 'convergence failure'
      endif
         

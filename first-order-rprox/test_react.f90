@@ -19,9 +19,9 @@ program main
   Xin(ic12) = 0.02d0
   
   ! burn
-  temp = 8.e8
+  temp = 9.e8
   rho = 2.e6
-  tmax = 1000.0
+  tmax = 0.001
 
   call react(Xin, temp, rho, tmax, Xout, enucdot)
 
