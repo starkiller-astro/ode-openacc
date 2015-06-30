@@ -1,5 +1,5 @@
-FC := pgf95
-#FC := gfortran
+#FC := pgf95
+FC := gfortran
 #FC := Cray
 
 ALL: test_react

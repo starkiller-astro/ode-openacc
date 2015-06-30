@@ -12,7 +12,7 @@ program main
   integer :: ic12, io16
 
   ! initialize the network
-  call network_init()
+  !call network_init()
 
   ! setup the composition
   ic12 = network_species_index("carbon-12")
