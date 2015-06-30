@@ -1,5 +1,9 @@
       SUBROUTINE DGETRF( M, N, A, LDA, IPIV, INFO )
 !$acc routine seq
+!$acc routine(DGEMM) seq
+!$acc routine(DGETF2) seq
+!$acc routine(DLASWP) seq
+!$acc routine(DTRSM) seq
 *
 *  -- LAPACK routine (version 3.2) --
 *  -- LAPACK is a software package provided by Univ. of Tennessee,    --
@@ -96,8 +100,8 @@
 *
 *     Quick return if possible
 *
-      IF( M.EQ.0 .OR. N.EQ.0 )
-     $   RETURN
+*      IF( M.EQ.0 .OR. N.EQ.0 )
+*     $   RETURN
 *
 *     Determine the block size for this environment.
 *

@@ -1,5 +1,7 @@
       SUBROUTINE DGESV( N, NRHS, A, LDA, IPIV, B, LDB, INFO )
 !$acc routine seq
+!$acc routine(dgetrf) seq
+!$acc routine(dgetrs) seq
 *
 *  -- LAPACK driver routine (version 3.2) --
 *  -- LAPACK is a software package provided by Univ. of Tennessee,    --
