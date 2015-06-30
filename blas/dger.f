@@ -1,4 +1,5 @@
       SUBROUTINE DGER(M,N,ALPHA,X,INCX,Y,INCY,A,LDA)
+!$acc routine seq
 *     .. Scalar Arguments ..
       DOUBLE PRECISION ALPHA
       INTEGER INCX,INCY,LDA,M,N
@@ -109,10 +110,11 @@
       ELSE IF (LDA.LT.MAX(1,M)) THEN
           INFO = 9
       END IF
-      IF (INFO.NE.0) THEN
-          CALL XERBLA('DGER  ',INFO)
-          RETURN
-      END IF
+      !NOTE: The below error handling has been commented out to ease OpenACC use
+      !IF (INFO.NE.0) THEN
+      !    CALL XERBLA('DGER  ',INFO)
+      !    RETURN
+      !END IF
 *
 *     Quick return if possible.
 *

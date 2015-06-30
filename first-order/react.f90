@@ -45,6 +45,13 @@ subroutine react(Xin, T, rho, tmax, Xout, enucdot)
   ic12 = network_species_index("carbon-12")
   io16 = network_species_index("oxygen-16")
 
+  !Start OpenACC here.  This is about where we would want to start it for a
+  !higher order, vectorized integrator.  
+  !Note: print statements don't play nice with GPUs, so
+  !they're commented out.
+
+  !$acc parallel
+
   ! get an estimate of the timestep by looking at the RHS
   ! dt = min{X/(dX/dt)}
   rpar(irp_dens) = rho
@@ -52,13 +59,12 @@ subroutine react(Xin, T, rho, tmax, Xout, enucdot)
   rpar(irp_o16) = Xin(io16)
 
   call rhs(nspec, 0.0d0, Xin, dXdt, rpar, ipar)
-  print *, dXdt
+  !print *, dXdt
 
   dt = 1.d33
   dt = 0.1*min(dt, abs(Xin(ic12)/dXdt(ic12)))
 
-  print *, "dt = ", dt
-
+  !print *, "dt = ", dt
 
   X_n(:) = Xin(:)
   
@@ -66,7 +72,7 @@ subroutine react(Xin, T, rho, tmax, Xout, enucdot)
   time = 0.0d0
   do while (time < tmax)
 
-     print *, time
+     !print *, time
 
      converged = .false.
 
@@ -144,4 +150,6 @@ subroutine react(Xin, T, rho, tmax, Xout, enucdot)
 
   Xout(:) = X_n(:)
 
+  !$acc end parallel
+  !End OpenACC here
 end subroutine react

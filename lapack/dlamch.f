@@ -62,6 +62,7 @@
 *
 *  =====================================================================
       DOUBLE PRECISION FUNCTION DLAMCH( CMACH )
+!$acc routine seq
 *
 *  -- LAPACK auxiliary routine (version 3.4.0) --
 *  -- LAPACK is a software package provided by Univ. of Tennessee,    --

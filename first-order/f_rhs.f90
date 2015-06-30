@@ -7,6 +7,7 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
   use rpar_indices
 
   implicit none
+  !$acc routine(rhs) seq
 
   ! our convention is that y(1:nspec) are the species (in the same
   ! order as defined in network.f90, and y(nspec+1) is the temperature
