@@ -35,14 +35,14 @@ module network
   integer, parameter :: naux  = 0
 
   character (len=16), parameter :: spec_names(nspec) = [& 
-    "carbon-12",&
-    "oxygen-16",&
-    "magnesium-24"]
+    "carbon-12       ",&
+    "oxygen-16       ",&
+    "magnesium-24    "]
 
   character (len= 5), parameter :: short_spec_names(nspec) = [&
-    "C12",&
-    "O16",&
-    "Mg24"]
+    "C12  ",&
+    "O16  ",&
+    "Mg24 "]
 
   real(kind=dp_t), parameter :: aion(nspec) = [&
     12.0_dp_t,&

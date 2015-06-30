@@ -76,110 +76,116 @@ subroutine screenz (t,d,z1,z2,a1,a2,ymass,nion,scfac, dscfacdt)
       
   !.... calculate average plasma parameters
   !....
-  if((z1*z2).le.0.d0) go to 50
+  if ((z1*z2) > 0.d0) then
 
-  qlam0=1.88d+8*sqrt(d/(abar*t**3))
-  dqlam0dt=-1.5d+0*qlam0 / t
+     qlam0=1.88d+8*sqrt(d/(abar*t**3))
+     dqlam0dt=-1.5d+0*qlam0 / t
 
-  ztilda=sqrt(z2bar+zbar*theta)
+     ztilda=sqrt(z2bar+zbar*theta)
 
-  qlam0z=qlam0*ztilda
-  dqlam0zdt=ztilda*dqlam0dt
+     qlam0z=qlam0*ztilda
+     dqlam0zdt=ztilda*dqlam0dt
 
-  gamp=2.27493d+5*(d*zbar*ytot1)**x13/t
-  dgampdt=-gamp/t
+     gamp=2.27493d+5*(d*zbar*ytot1)**x13/t
+     dgampdt=-gamp/t
 
-  taufac=4.248719d+3/t**x13
-  dtaufacdt=-x13*taufac/t
+     taufac=4.248719d+3/t**x13
+     dtaufacdt=-x13*taufac/t
 
-  !.... calculate screening factor
-  !.... approx. for strong screening only good for alpha .lt. 1.6
+     !.... calculate screening factor
+     !.... approx. for strong screening only good for alpha .lt. 1.6
 
-  zhat=(z1+z2)**x53-z1**x53-z2**x53
-  zhat2=(z1+z2)**x512-z1**x512-z2**x512
+     zhat=(z1+z2)**x53-z1**x53-z2**x53
+     zhat2=(z1+z2)**x512-z1**x512-z2**x512
+     
+     gamef=2.d0**x13*gamp*z1*z2/(z1+z2)**x13
+     dgamefdt=gamef*dgampdt/gamp
+     
+     tau12=taufac*(z1**2*z2**2*a1*a2/(a1+a2))**x13
+     dtau12dt=tau12*dtaufacdt/taufac
+     
+     alph12=3.d0*gamef/tau12
+     dalph12dt=alph12*(dgamefdt/gamef - dtau12dt/tau12)
 
-  gamef=2.d0**x13*gamp*z1*z2/(z1+z2)**x13
-  dgamefdt=gamef*dgampdt/gamp
+     !....
+     !.... limit alph12 to 1.6 to prevent unphysical behavior
+     !.... (h dec. as rho inc.) at high rho.  this should really
+     !.... be replaced by a pycnonuclear reaction rate formula.
+     !....
+     if (alph12 > 1.6d0) then
 
-  tau12=taufac*(z1**2*z2**2*a1*a2/(a1+a2))**x13
-  dtau12dt=tau12*dtaufacdt/taufac
+        alph12=1.6d0
+        dalph12dt=0.0d0
+        
+        gamef=1.6d0*tau12/3.d0
+        dgamefdt=gamef*dtau12dt/tau12
 
-  alph12=3.d0*gamef/tau12
-  dalph12dt=alph12*(dgamefdt/gamef - dtau12dt/tau12)
+        gamp=gamef*(z1+z2)**x13/(2.d0**x13*z1*z2)
+        dgampdt=gamp*dgamefdt/gamef
 
-  !....
-  !.... limit alph12 to 1.6 to prevent unphysical behavior
-  !.... (h dec. as rho inc.) at high rho.  this should really
-  !.... be replaced by a pycnonuclear reaction rate formula.
-  !....
-  if(alph12.le.1.6d0) go to 60
+     endif
+     
+     h12w=z1*z2*qlam0z
+     dh12wdt=h12w*dqlam0zdt/qlam0z
 
-  alph12=1.6d0
-  dalph12dt=0.0d0
+     h12=h12w
+     dh12dt=dh12wdt
 
-  gamef=1.6d0*tau12/3.d0
-  dgamefdt=gamef*dtau12dt/tau12
+     if (gamef > 0.3d0) then 
 
-  gamp=gamef*(z1+z2)**x13/(2.d0**x13*z1*z2)
-  dgampdt=gamp*dgamefdt/gamef
+        c=0.896434d0*gamp*zhat-3.44740d0*gamp**x14*zhat2- &
+             0.5551d0*(log(gamp)+x53*log(z1*z2/(z1+z2)))-2.996d0
 
-60 h12w=z1*z2*qlam0z
-  dh12wdt=h12w*dqlam0zdt/qlam0z
+        dcdt=0.896434d0*dgampdt*zhat- &
+             3.44740d0*x14*gamp**(x14-1.0d0)*zhat2*dgampdt- &
+             0.5551d0*dgampdt/gamp
+     
+        h12=c-(tau12/3.d0)*(5.d0*alph12**3/32.d0-0.014d0*alph12**4 &
+             -0.0128d0*alph12**5)-gamef*(0.0055d0*alph12**4 &
+             -0.0098d0*alph12**5+0.0048d0*alph12**6)
+     
+        dh12dt=dcdt - ((dtau12dt*alph12**3 + 3.0d0*tau12*alph12**2* &
+             dalph12dt)*(5.d0/32.d0 - 0.014d0*alph12 - &
+             0.0128d0*alph12**2) + tau12*alph12**3*dalph12dt*(-0.014d0 &
+             - 2.d0*0.0128d0*alph12))/3.d0 -(dgamefdt*alph12**4 + 4.d0 &
+             *gamef*alph12**3*dalph12dt)*(0.0055d0 - 0.0098d0*alph12 - &
+             0.0048d0*alph12**2) - gamef*alph12**4*dalph12dt*(-0.0098d0 &
+             + 2.d0*0.0048d0*alph12)
+        
+        h12fac=0.77d0
 
-  h12=h12w
-  dh12dt=dh12wdt
-  if(gamef.gt.0.3d0) go to 30
-  go to 40
-      
-30 c=0.896434d0*gamp*zhat-3.44740d0*gamp**x14*zhat2- &
-        0.5551d0*(log(gamp)+x53*log(z1*z2/(z1+z2)))-2.996d0
+        h12=log(max(1.d+0-0.0562d+0*alph12**3,h12fac))+h12
+        if (1.d+0-0.0562d+0*alph12**3 .gt. h12fac) then
+           dh12dt=(-3.d0*0.0562d0*alph12**2*dalph12dt)/ &
+             (1.d0-0.0562d0*alph12**3) + dh12dt
+        endif
 
-  dcdt=0.896434d0*dgampdt*zhat- &
-       3.44740d0*x14*gamp**(x14-1.0d0)*zhat2*dgampdt- &
-       0.5551d0*dgampdt/gamp
+        if(gamef <= 0.8d0) then
+        
+           h12=h12w*((0.8d0-gamef)/0.5d0)+h12*((gamef-0.3d0)/0.5d0)
+           dh12dt=((dh12wdt*(0.8d0-gamef) - h12w*dgamefdt + dh12dt* &
+                (gamef-0.3d0) + h12*dgamefdt)/0.5d0)
+        endif
+     endif
+     
+     if (h12.gt.300.d0) then
+        h12=300.d0
+        dh12dt=0.d0
+     endif
 
-  h12=c-(tau12/3.d0)*(5.d0*alph12**3/32.d0-0.014d0*alph12**4 &
-          -0.0128d0*alph12**5)-gamef*(0.0055d0*alph12**4 &
-          -0.0098d0*alph12**5+0.0048d0*alph12**6)
-  
-  dh12dt=dcdt - ((dtau12dt*alph12**3 + 3.0d0*tau12*alph12**2* &
-       dalph12dt)*(5.d0/32.d0 - 0.014d0*alph12 - &
-       0.0128d0*alph12**2) + tau12*alph12**3*dalph12dt*(-0.014d0 &
-       - 2.d0*0.0128d0*alph12))/3.d0 -(dgamefdt*alph12**4 + 4.d0 &
-       *gamef*alph12**3*dalph12dt)*(0.0055d0 - 0.0098d0*alph12 - &
-       0.0048d0*alph12**2) - gamef*alph12**4*dalph12dt*(-0.0098d0 &
-       + 2.d0*0.0048d0*alph12)
+     if (h12.lt.0.d0) then
+        h12=0.d0
+        dh12dt=0.d0
+     endif
 
-  h12fac=0.77d0
+     scfac=exp(h12)
+     dscfacdt=scfac*dh12dt
 
-  h12=log(max(1.d+0-0.0562d+0*alph12**3,h12fac))+h12
-  if (1.d+0-0.0562d+0*alph12**3 .gt. h12fac) then
-     dh12dt=(-3.d0*0.0562d0*alph12**2*dalph12dt)/ &
-          (1.d0-0.0562d0*alph12**3) + dh12dt
+  else
+     scfac=1.d0
+     dscfacdt=0.d0
   endif
 
-  if(gamef.gt.0.8d0) go to 40
-
-  h12=h12w*((0.8d0-gamef)/0.5d0)+h12*((gamef-0.3d0)/0.5d0)
-  dh12dt=((dh12wdt*(0.8d0-gamef) - h12w*dgamefdt + dh12dt* &
-       (gamef-0.3d0) + h12*dgamefdt)/0.5d0)
-
-40 if(h12.gt.300.d0) then
-     h12=300.d0
-     dh12dt=0.d0
-  endif
-
-  if(h12.lt.0.d0) then
-     h12=0.d0
-     dh12dt=0.d0
-  endif
-
-  scfac=exp(h12)
-  dscfacdt=scfac*dh12dt
-  return
-
-50 scfac=1.d0
-  dscfacdt=0.d0
   return
 
 end subroutine screenz
