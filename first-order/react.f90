@@ -1,10 +1,13 @@
-subroutine react(Xin, T, rho, tmax, Xout, enucdot)
+subroutine react(Xin, T, rho, tmax, Xout, ierr)
 
   use network
   use rpar_indices
 
   implicit none
 
+  !$acc routine(rhs) seq
+  !$acc routine(dgesv) seq
+  
   ! do a simple first-order backward Euler method for integrating
   ! a stiff-system of ODEs.
 
@@ -16,7 +19,7 @@ subroutine react(Xin, T, rho, tmax, Xout, enucdot)
   double precision, dimension(nspec), intent(in) :: Xin
   double precision, dimension(nspec), intent(out) :: Xout
   double precision, intent(in) :: T, rho, tmax
-  double precision, intent(out) :: enucdot
+  integer, intent(out) :: ierr
 
   double precision :: time, dt, I
 
@@ -41,7 +44,8 @@ subroutine react(Xin, T, rho, tmax, Xout, enucdot)
   integer, parameter :: max_iter = 10
   integer :: iter
   logical :: converged
-  
+ 
+  ierr = 0 
   ic12 = network_species_index("carbon-12")
   io16 = network_species_index("oxygen-16")
 
@@ -137,7 +141,9 @@ subroutine react(Xin, T, rho, tmax, Xout, enucdot)
      enddo   ! dX iteration loop
 
      if (.not. converged) then
-        stop 'convergence failure'
+        ierr = 1
+        exit
+        !stop 'convergence failure'
      endif
         
      if (time + dt > tmax) then

@@ -1,12 +1,13 @@
-      subroutine screenz (t,d,z1,z2,a1,a2,ymass,aion,zion,nion,
+      subroutine screenz (t,d,z1,z2,a1,a2,ymass,nion,
      1                    scfac, dscfacdt)
-!$acc routine seq
+      use network
 
       implicit none
+!$acc routine seq
 
       integer nion
       double precision t, d, z1, z2, a1, a2
-      double precision, dimension(nion) :: ymass, aion, zion
+      double precision, dimension(nion) :: ymass
       double precision scfac
       double precision dscfacdt
 
@@ -45,6 +46,7 @@
       double precision dgamefdt, dtau12dt, dalph12dt 
       double precision h12w, h12, c, h12fac
       double precision dh12wdt, dh12dt, dcdt
+  
 
 !... calculate averages for screening routine
 !... nb  y = x/a with x the mass fraction

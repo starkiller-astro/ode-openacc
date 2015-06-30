@@ -18,3 +18,10 @@ norm:  blas level-1: dnrm2
 
 maxtrix vector multiply: blas level-2: dgemv
 
+
+Modules:
+craype-accel-nvidia35
+cudatoolkit
+PrgEnv-pgi, PrgEnv-cray
+
+

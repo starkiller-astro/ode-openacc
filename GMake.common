@@ -35,7 +35,7 @@ else ifeq ($(FC),pgf95)
   wrapper := ftn
 
 else ifeq ($(FC),Cray)
-  FFLAGS := -c -h acc,msgs -fpic -dynamic -lcudart -J $(odir) -I $(odir) 
+  FFLAGS := -c -h acc,msgs -lcudart -em  -J $(odir) -I $(odir) 
   wrapper := ftn
 
 else

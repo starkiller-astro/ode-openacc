@@ -20,6 +20,7 @@
 module network
 
   use bl_types
+  use network_indices
 
   implicit none
 
@@ -33,56 +34,38 @@ module network
   integer, parameter :: nspec_advance = 1
   integer, parameter :: naux  = 0
 
-  character (len=16), save :: spec_names(nspec) 
-  character (len= 5), save :: short_spec_names(nspec)
-  character (len= 5), save :: short_aux_names(naux)
+  character (len=16), parameter :: spec_names(nspec) = [& 
+    "carbon-12",&
+    "oxygen-16",&
+    "magnesium-24"]
 
-  real(kind=dp_t), save :: aion(nspec), zion(nspec), ebin(nspec)
+  character (len= 5), parameter :: short_spec_names(nspec) = [&
+    "C12",&
+    "O16",&
+    "Mg24"]
 
-  logical, save :: network_initialized = .false.
+  real(kind=dp_t), parameter :: aion(nspec) = [&
+    12.0_dp_t,&
+    16.0_dp_t,&
+    24.0_dp_t]
+  
+  real(kind=dp_t), parameter :: zion(nspec) = [&
+    6.0_dp_t,& 
+    8.0_dp_t,& 
+    12.0_dp_t]
 
+  
+  real(kind=dp_t), parameter :: ebin(nspec) = [&
+    -7.4103097e18_dp_t,&     !  92.16294 MeV
+    -7.6959672e18_dp_t,&     ! 127.62093 MeV
+    -7.9704080e18_dp_t]     ! 198.2579  MeV
+
+  !$acc declare copyin(short_spec_names, aion, zion, ebin) 
+  !$acc declare copyin(network_name, nspec, nspec_advance, naux)
+  !$acc declare copyin(spec_names) 
+  
 contains
   
-  subroutine network_init()
-
-    use network_indices
-    use rpar_indices
-
-    spec_names(ic12_)  = "carbon-12"
-    spec_names(io16_)  = "oxygen-16"
-    spec_names(img24_) = "magnesium-24"
-
-    short_spec_names(ic12_)  = "C12"
-    short_spec_names(io16_)  = "O16"
-    short_spec_names(img24_) = "Mg24"
-
-    aion(ic12_)  = 12.0_dp_t
-    aion(io16_)  = 16.0_dp_t
-    aion(img24_) = 24.0_dp_t
-    
-    zion(ic12_)  = 6.0_dp_t
-    zion(io16_)  = 8.0_dp_t
-    zion(img24_) = 12.0_dp_t
-
-    ! our convention is that the binding energies are negative.  We convert
-    ! from the MeV values that are traditionally written in astrophysics 
-    ! papers by multiplying by 1.e6 eV/MeV * 1.60217646e-12 erg/eV.  The
-    ! MeV values are per nucleus, so we divide by aion to make it per
-    ! nucleon and we multiple by Avogardo's # (6.0221415e23) to get the 
-    ! value in erg/g
-    ebin(ic12_)  = -7.4103097e18_dp_t     !  92.16294 MeV
-    ebin(io16_)  = -7.6959672e18_dp_t     ! 127.62093 MeV
-    ebin(img24_) = -7.9704080e18_dp_t     ! 198.2579  MeV
-
-    ! rpar is VODE's way of passing information into the RHS and
-    ! jacobian routines.  Here we initialize some indices to make
-    ! sense of what is stored in the rpar() array.
-    call init_rpar_indices(nspec)
-
-    network_initialized = .true.
-
-  end subroutine network_init
-
   function network_species_index(name) result(r)
 
     character(len=*) :: name

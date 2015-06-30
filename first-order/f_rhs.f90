@@ -7,7 +7,8 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
   use rpar_indices
 
   implicit none
-  !$acc routine(rhs) seq
+  !$acc routine seq
+  !$acc routine(screenz) seq
 
   ! our convention is that y(1:nspec) are the species (in the same
   ! order as defined in network.f90, and y(nspec+1) is the temperature
@@ -38,7 +39,6 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
   
   real(kind=dp_t) :: a, b, dadt, dbdt
 
-
   dens = rpar(irp_dens)
   temp = rpar(irp_temp)
 
@@ -51,7 +51,7 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
 
 
   ! call the screening routine
-  call screenz(temp,dens,6.0d0,6.0d0,12.0d0,12.0d0,ymass,aion,zion,nspec,     &
+  call screenz(temp,dens,6.0d0,6.0d0,12.0d0,12.0d0,ymass,nspec,     &
                sc1212, dsc1212dt)
 
   
