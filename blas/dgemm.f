@@ -1,4 +1,5 @@
       SUBROUTINE DGEMM(TRANSA,TRANSB,M,N,K,ALPHA,A,LDA,B,LDB,BETA,C,LDC)
+!$acc routine seq
 *     .. Scalar Arguments ..
       DOUBLE PRECISION ALPHA,BETA
       INTEGER K,LDA,LDB,LDC,M,N
@@ -192,10 +193,10 @@
       ELSE IF (LDC.LT.MAX(1,M)) THEN
           INFO = 13
       END IF
-      IF (INFO.NE.0) THEN
-          CALL XERBLA('DGEMM ',INFO)
-          RETURN
-      END IF
+      !IF (INFO.NE.0) THEN
+      !    CALL XERBLA('DGEMM ',INFO)
+      !    RETURN
+      !END IF
 *
 *     Quick return if possible.
 *

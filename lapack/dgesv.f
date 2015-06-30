@@ -1,4 +1,5 @@
       SUBROUTINE DGESV( N, NRHS, A, LDA, IPIV, B, LDB, INFO )
+!$acc routine seq
 *
 *  -- LAPACK driver routine (version 3.2) --
 *  -- LAPACK is a software package provided by Univ. of Tennessee,    --
@@ -86,10 +87,11 @@
       ELSE IF( LDB.LT.MAX( 1, N ) ) THEN
          INFO = -7
       END IF
-      IF( INFO.NE.0 ) THEN
-         CALL XERBLA( 'DGESV ', -INFO )
-         RETURN
-      END IF
+      !NOTE: The below error handling has been commented out to ease OpenACC use
+      !IF( INFO.NE.0 ) THEN
+      !   CALL XERBLA( 'DGESV ', -INFO )
+      !   RETURN
+      !END IF
 *
 *     Compute the LU factorization of A.
 *

@@ -1,4 +1,5 @@
       SUBROUTINE DGETF2( M, N, A, LDA, IPIV, INFO )
+!$acc routine seq
 *
 *  -- LAPACK routine (version 3.2) --
 *  -- LAPACK is a software package provided by Univ. of Tennessee,    --
@@ -89,10 +90,11 @@
       ELSE IF( LDA.LT.MAX( 1, M ) ) THEN
          INFO = -4
       END IF
-      IF( INFO.NE.0 ) THEN
-         CALL XERBLA( 'DGETF2', -INFO )
-         RETURN
-      END IF
+      !NOTE: The below error handling has been commented out to ease OpenACC use
+      !IF( INFO.NE.0 ) THEN
+      !   CALL XERBLA( 'DGETF2', -INFO )
+      !   RETURN
+      !END IF
 *
 *     Quick return if possible
 *

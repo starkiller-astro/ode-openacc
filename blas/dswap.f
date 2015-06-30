@@ -1,4 +1,5 @@
       SUBROUTINE DSWAP(N,DX,INCX,DY,INCY)
+!$acc routine seq
 *     .. Scalar Arguments ..
       INTEGER INCX,INCY,N
 *     ..

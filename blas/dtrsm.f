@@ -1,4 +1,5 @@
       SUBROUTINE DTRSM(SIDE,UPLO,TRANSA,DIAG,M,N,ALPHA,A,LDA,B,LDB)
+!$acc routine seq
 *     .. Scalar Arguments ..
       DOUBLE PRECISION ALPHA
       INTEGER LDA,LDB,M,N
@@ -181,10 +182,10 @@
       ELSE IF (LDB.LT.MAX(1,M)) THEN
           INFO = 11
       END IF
-      IF (INFO.NE.0) THEN
-          CALL XERBLA('DTRSM ',INFO)
-          RETURN
-      END IF
+      !IF (INFO.NE.0) THEN
+      !    CALL XERBLA('DTRSM ',INFO)
+      !    RETURN
+      !END IF
 *
 *     Quick return if possible.
 *
