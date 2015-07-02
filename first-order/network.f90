@@ -58,14 +58,14 @@ contains
     "carbon-12       ",&
     "oxygen-16       ",&
     "magnesium-24    "]
-    !!$acc update device(spec_names)
+    !$acc update device(spec_names)
 
     allocate(short_spec_names(nspec))
     short_spec_names = [&
     "C12  ",&
     "O16  ",&
     "Mg24 "]
-    !!$acc update device(short_spec_names)
+    !$acc update device(short_spec_names)
 
     allocate(aion(nspec))
     aion = [&
