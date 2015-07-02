@@ -3,7 +3,8 @@
 *     .. Scalar Arguments ..
       DOUBLE PRECISION ALPHA,BETA
       INTEGER K,LDA,LDB,LDC,M,N
-      CHARACTER TRANSA,TRANSB
+*!      CHARACTER TRANSA,TRANSB
+      INTEGER TRANSA,TRANSB
 *     ..
 *     .. Array Arguments ..
       DOUBLE PRECISION A(LDA,*),B(LDB,*),C(LDC,*)
@@ -30,11 +31,11 @@
 *           On entry, TRANSA specifies the form of op( A ) to be used in
 *           the matrix multiplication as follows:
 *
-*              TRANSA = 'N' or 'n',  op( A ) = A.
+*              TRANSA = 1 --> 'N' or 'n',  op( A ) = A.
 *
-*              TRANSA = 'T' or 't',  op( A ) = A**T.
+*              TRANSA = 2 --> 'T' or 't',  op( A ) = A**T.
 *
-*              TRANSA = 'C' or 'c',  op( A ) = A**T.
+*              TRANSA = 3 --> 'C' or 'c',  op( A ) = A**T.
 *
 *           Unchanged on exit.
 *
@@ -42,11 +43,11 @@
 *           On entry, TRANSB specifies the form of op( B ) to be used in
 *           the matrix multiplication as follows:
 *
-*              TRANSB = 'N' or 'n',  op( B ) = B.
-*
-*              TRANSB = 'T' or 't',  op( B ) = B**T.
-*
-*              TRANSB = 'C' or 'c',  op( B ) = B**T.
+*              TRANSB = 1 --> 'N' or 'n',  op( B ) = B.
+*                             
+*              TRANSB = 2 --> 'T' or 't',  op( B ) = B**T.
+*                             
+*              TRANSB = 3 --> 'C' or 'c',  op( B ) = B**T.
 *
 *           Unchanged on exit.
 *
@@ -156,8 +157,10 @@
 *     transposed and set  NROWA, NCOLA and  NROWB  as the number of rows
 *     and  columns of  A  and the  number of  rows  of  B  respectively.
 *
-      NOTA = LSAME(TRANSA,'N')
-      NOTB = LSAME(TRANSB,'N')
+*!      NOTA = LSAME(TRANSA,'N')
+      NOTA = TRANSA == 1
+*!      NOTB = LSAME(TRANSB,'N')
+      NOTB = TRANSB == 1
       IF (NOTA) THEN
           NROWA = M
           NCOLA = K
@@ -174,11 +177,15 @@
 *     Test the input parameters.
 *
       INFO = 0
-      IF ((.NOT.NOTA) .AND. (.NOT.LSAME(TRANSA,'C')) .AND.
-     +    (.NOT.LSAME(TRANSA,'T'))) THEN
+*!      IF ((.NOT.NOTA) .AND. (.NOT.LSAME(TRANSA,'C')) .AND.
+*!     +    (.NOT.LSAME(TRANSA,'T'))) THEN
+      IF ((.NOT.NOTA) .AND. (.NOT.TRANSA==3) .AND.
+     +    (.NOT.TRANSA==2)) THEN
           INFO = 1
-      ELSE IF ((.NOT.NOTB) .AND. (.NOT.LSAME(TRANSB,'C')) .AND.
-     +         (.NOT.LSAME(TRANSB,'T'))) THEN
+*!      ELSE IF ((.NOT.NOTB) .AND. (.NOT.LSAME(TRANSB,'C')) .AND.
+*!     +         (.NOT.LSAME(TRANSB,'T'))) THEN
+      ELSE IF ((.NOT.NOTB) .AND. (.NOT.TRANSB==3) .AND.
+     +         (.NOT.TRANSB==2)) THEN
           INFO = 2
       ELSE IF (M.LT.0) THEN
           INFO = 3

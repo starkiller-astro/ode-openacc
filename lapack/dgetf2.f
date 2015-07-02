@@ -103,12 +103,13 @@
 *
 *     Quick return if possible
 *
-      IF( M.EQ.0 .OR. N.EQ.0 )
-     $   RETURN
+*!      IF( M.EQ.0 .OR. N.EQ.0 )
+*!     $   RETURN
 *
 *     Compute machine safe minimum 
 * 
-      SFMIN = DLAMCH('S')  
+*!      SFMIN = DLAMCH('S')  
+      SFMIN = DLAMCH(2)  
 *
       DO 10 J = 1, MIN( M, N )
 *

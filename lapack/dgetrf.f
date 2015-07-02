@@ -74,8 +74,8 @@
       EXTERNAL           DGEMM, DGETF2, DLASWP, DTRSM, XERBLA
 *     ..
 *     .. External Functions ..
-      INTEGER            ILAENV
-      EXTERNAL           ILAENV
+*!      INTEGER            ILAENV
+*!      EXTERNAL           ILAENV
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC          MAX, MIN
@@ -105,7 +105,11 @@
 *
 *     Determine the block size for this environment.
 *
-      NB = ILAENV( 1, 'DGETRF', ' ', M, N, -1, -1 )
+*!      NB = ILAENV( 1, 'DGETRF', ' ', M, N, -1, -1 )
+*!    TODO: As of now I'm just hard-coding the return value of ILAENV, 
+*!    which is 64 for the specific run we're testing for GPUs.  
+*!    This is a hack that'll need to be changed.
+      NB = 64
       IF( NB.LE.1 .OR. NB.GE.MIN( M, N ) ) THEN
 *
 *        Use unblocked code.
@@ -144,14 +148,16 @@
 *
 *              Compute block row of U.
 *
-               CALL DTRSM( 'Left', 'Lower', 'No transpose', 'Unit', JB,
+*!               CALL DTRSM( 'Left', 'Lower', 'No transpose', 'Unit', JB,
+               CALL DTRSM( 1, 2, 1, 1, JB,
      $                     N-J-JB+1, ONE, A( J, J ), LDA, A( J, J+JB ),
      $                     LDA )
                IF( J+JB.LE.M ) THEN
 *
 *                 Update trailing submatrix.
 *
-                  CALL DGEMM( 'No transpose', 'No transpose', M-J-JB+1,
+*!                  CALL DGEMM( 'No transpose', 'No transpose', M-J-JB+1,
+                  CALL DGEMM( 1, 1, M-J-JB+1,
      $                        N-J-JB+1, JB, -ONE, A( J+JB, J ), LDA,
      $                        A( J, J+JB ), LDA, ONE, A( J+JB, J+JB ),
      $                        LDA )

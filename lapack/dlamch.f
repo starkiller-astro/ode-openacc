@@ -25,16 +25,16 @@
 *> \param[in] CMACH
 *> \verbatim
 *>          Specifies the value to be returned by DLAMCH:
-*>          = 'E' or 'e',   DLAMCH := eps
-*>          = 'S' or 's ,   DLAMCH := sfmin
-*>          = 'B' or 'b',   DLAMCH := base
-*>          = 'P' or 'p',   DLAMCH := eps*base
-*>          = 'N' or 'n',   DLAMCH := t
-*>          = 'R' or 'r',   DLAMCH := rnd
-*>          = 'M' or 'm',   DLAMCH := emin
-*>          = 'U' or 'u',   DLAMCH := rmin
-*>          = 'L' or 'l',   DLAMCH := emax
-*>          = 'O' or 'o',   DLAMCH := rmax
+*>          = 1  --> 'E' or 'e',   DLAMCH := eps
+*>          = 2  --> 'S' or 's ,   DLAMCH := sfmin
+*>          = 3  --> 'B' or 'b',   DLAMCH := base
+*>          = 4  --> 'P' or 'p',   DLAMCH := eps*base
+*>          = 5  --> 'N' or 'n',   DLAMCH := t
+*>          = 6  --> 'R' or 'r',   DLAMCH := rnd
+*>          = 7  --> 'M' or 'm',   DLAMCH := emin
+*>          = 8  --> 'U' or 'u',   DLAMCH := rmin
+*>          = 9  --> 'L' or 'l',   DLAMCH := emax
+*>          = 10 --> 'O' or 'o',   DLAMCH := rmax
 *>          where
 *>          eps   = relative machine precision
 *>          sfmin = safe minimum, such that 1/sfmin does not overflow
@@ -70,7 +70,8 @@
 *     November 2011
 *
 *     .. Scalar Arguments ..
-      CHARACTER          CMACH
+*      CHARACTER          CMACH
+      INTEGER            CMACH
 *     ..
 *
 *     .. Scalar Arguments ..
@@ -106,10 +107,13 @@
       ELSE
          EPS = EPSILON(ZERO)
       END IF
+*'
 *
-      IF( LSAME( CMACH, 'E' ) ) THEN
+*!      IF( LSAME( CMACH, 'E' ) ) THEN
+      IF( CMACH == 1 ) THEN
          RMACH = EPS
-      ELSE IF( LSAME( CMACH, 'S' ) ) THEN
+*!      ELSE IF( LSAME( CMACH, 'S' ) ) THEN
+      ELSE IF( CMACH == 2 ) THEN
          SFMIN = TINY(ZERO)
          SMALL = ONE / HUGE(ZERO)
          IF( SMALL.GE.SFMIN ) THEN
@@ -120,21 +124,29 @@
             SFMIN = SMALL*( ONE+EPS )
          END IF
          RMACH = SFMIN
-      ELSE IF( LSAME( CMACH, 'B' ) ) THEN
+*!      ELSE IF( LSAME( CMACH, 'B' ) ) THEN
+      ELSE IF( CMACH == 3 ) THEN
          RMACH = RADIX(ZERO)
-      ELSE IF( LSAME( CMACH, 'P' ) ) THEN
+*!      ELSE IF( LSAME( CMACH, 'P' ) ) THEN
+      ELSE IF( CMACH == 4 ) THEN
          RMACH = EPS * RADIX(ZERO)
-      ELSE IF( LSAME( CMACH, 'N' ) ) THEN
+*!      ELSE IF( LSAME( CMACH, 'N' ) ) THEN
+      ELSE IF( CMACH == 5 ) THEN
          RMACH = DIGITS(ZERO)
-      ELSE IF( LSAME( CMACH, 'R' ) ) THEN
+*!      ELSE IF( LSAME( CMACH, 'R' ) ) THEN
+      ELSE IF( CMACH == 6 ) THEN
          RMACH = RND
-      ELSE IF( LSAME( CMACH, 'M' ) ) THEN
+*!      ELSE IF( LSAME( CMACH, 'M' ) ) THEN
+      ELSE IF( CMACH == 7 ) THEN
          RMACH = MINEXPONENT(ZERO)
-      ELSE IF( LSAME( CMACH, 'U' ) ) THEN
+*!      ELSE IF( LSAME( CMACH, 'U' ) ) THEN
+      ELSE IF( CMACH == 8 ) THEN
          RMACH = tiny(zero)
-      ELSE IF( LSAME( CMACH, 'L' ) ) THEN
+*!      ELSE IF( LSAME( CMACH, 'L' ) ) THEN
+      ELSE IF( CMACH == 9 ) THEN
          RMACH = MAXEXPONENT(ZERO)
-      ELSE IF( LSAME( CMACH, 'O' ) ) THEN
+*!      ELSE IF( LSAME( CMACH, 'O' ) ) THEN
+      ELSE IF( CMACH == 10 ) THEN
          RMACH = HUGE(ZERO)
       ELSE
          RMACH = ZERO

@@ -1,4 +1,5 @@
       SUBROUTINE DGETRS( TRANS, N, NRHS, A, LDA, IPIV, B, LDB, INFO )
+!$acc routine seq
 *
 *  -- LAPACK routine (version 3.3.1) --
 *  -- LAPACK is a software package provided by Univ. of Tennessee,    --
@@ -6,8 +7,8 @@
 *  -- April 2011                                                      --
 *
 *     .. Scalar Arguments ..
-      CHARACTER          TRANS
-      INTEGER            INFO, LDA, LDB, N, NRHS
+*      CHARACTER          TRANS(1)
+      INTEGER            INFO, LDA, LDB, N, NRHS, TRANS
 *     ..
 *     .. Array Arguments ..
       INTEGER            IPIV( * )
@@ -25,11 +26,11 @@
 *  Arguments
 *  =========
 *
-*  TRANS   (input) CHARACTER*1
+*  TRANS   (input) INTEGER
 *          Specifies the form of the system of equations:
-*          = 'N':  A * X = B  (No transpose)
-*          = 'T':  A**T* X = B  (Transpose)
-*          = 'C':  A**T* X = B  (Conjugate transpose = Transpose)
+*          = 1 --> 'N':  A * X = B  (No transpose)
+*          = 2 --> 'T':  A**T* X = B  (Transpose)
+*          = 3 --> 'C':  A**T* X = B  (Conjugate transpose = Transpose)
 *
 *  N       (input) INTEGER
 *          The order of the matrix A.  N >= 0.
@@ -84,12 +85,13 @@
 *     Test the input parameters.
 *
       INFO = 0
-      NOTRAN = LSAME( TRANS, 'N' )
-      IF( .NOT.NOTRAN .AND. .NOT.LSAME( TRANS, 'T' ) .AND. .NOT.
-     $    LSAME( TRANS, 'C' ) ) THEN
+*      NOTRAN = LSAME( TRANS, 'N' )
+      NOTRAN = TRANS == 1
+      IF( .NOT.NOTRAN .AND. .NOT. TRANS == 2 .AND. .NOT.
+     $    TRANS == 3 ) THEN
          INFO = -1
-      ELSE IF( N.LT.0 ) THEN
-         INFO = -2
+*      ELSE IF( N.LT.0 ) THEN
+*         INFO = -2
       ELSE IF( NRHS.LT.0 ) THEN
          INFO = -3
       ELSE IF( LDA.LT.MAX( 1, N ) ) THEN
@@ -97,10 +99,10 @@
       ELSE IF( LDB.LT.MAX( 1, N ) ) THEN
          INFO = -8
       END IF
-      IF( INFO.NE.0 ) THEN
-         CALL XERBLA( 'DGETRS', -INFO )
-         RETURN
-      END IF
+*      !IF( INFO.NE.0 ) THEN
+*      !   CALL XERBLA( 'DGETRS', -INFO )
+*      !   RETURN
+*      !END IF
 *
 *     Quick return if possible
 *

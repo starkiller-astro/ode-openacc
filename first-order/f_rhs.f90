@@ -51,8 +51,8 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
 
 
   ! call the screening routine
-  !call screenz(temp,dens,6.0d0,6.0d0,12.0d0,12.0d0,ymass,nspec,     &
-  !             sc1212, dsc1212dt)
+  call screenz(temp,dens,6.0d0,6.0d0,12.0d0,12.0d0,ymass,nspec,     &
+               aion(1:nspec), zion(1:nspec), sc1212, dsc1212dt)
 
   
   ! compute some often used temperature constants

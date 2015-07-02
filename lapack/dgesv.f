@@ -12,8 +12,9 @@
       INTEGER            INFO, LDA, LDB, N, NRHS
 *     ..
 *     .. Array Arguments ..
-      INTEGER            IPIV( * )
+      INTEGER            IPIV( * ), TRANS
       DOUBLE PRECISION   A( LDA, * ), B( LDB, * )
+*      CHARACTER          TRANS(1)
 *     ..
 *
 *  Purpose
@@ -102,7 +103,9 @@
 *
 *        Solve the system A*X = B, overwriting B with X.
 *
-         CALL DGETRS( 'No transpose', N, NRHS, A, LDA, IPIV, B, LDB,
+*         CALL DGETRS( 'No transpose', N, NRHS, A, LDA, IPIV, B, LDB,
+         TRANS = 1
+         CALL DGETRS( TRANS, N, NRHS, A, LDA, IPIV, B, LDB,
      $                INFO )
       END IF
       RETURN

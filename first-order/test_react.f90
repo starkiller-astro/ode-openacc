@@ -13,6 +13,7 @@ program main
 
   ! initialize the network
   !call network_init()
+  call network_initialize()
 
   ! setup the composition
   ic12 = network_species_index("carbon-12")

@@ -1,13 +1,10 @@
-subroutine screenz (t,d,z1,z2,a1,a2,ymass,nion,scfac, dscfacdt)
-
-  use network
-
+subroutine screenz (t,d,z1,z2,a1,a2,ymass,nion,aion, zion,scfac, dscfacdt)
   implicit none
-!$acc routine seq
+  !$acc routine seq
 
   integer nion
   double precision t, d, z1, z2, a1, a2
-  double precision, dimension(nion) :: ymass
+  double precision, dimension(nion) :: ymass, aion, zion
   double precision scfac
   double precision dscfacdt
 

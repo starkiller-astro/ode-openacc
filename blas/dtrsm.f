@@ -3,7 +3,8 @@
 *     .. Scalar Arguments ..
       DOUBLE PRECISION ALPHA
       INTEGER LDA,LDB,M,N
-      CHARACTER DIAG,SIDE,TRANSA,UPLO
+*!      CHARACTER DIAG,SIDE,TRANSA,UPLO
+      INTEGER DIAG,SIDE,TRANSA,UPLO
 *     ..
 *     .. Array Arguments ..
       DOUBLE PRECISION A(LDA,*),B(LDB,*)
@@ -30,9 +31,9 @@
 *           On entry, SIDE specifies whether op( A ) appears on the left
 *           or right of X as follows:
 *
-*              SIDE = 'L' or 'l'   op( A )*X = alpha*B.
+*              SIDE = 1 --> 'L' or 'l'   op( A )*X = alpha*B.
 *
-*              SIDE = 'R' or 'r'   X*op( A ) = alpha*B.
+*              SIDE = 2 --> 'R' or 'r'   X*op( A ) = alpha*B.
 *
 *           Unchanged on exit.
 *
@@ -40,9 +41,9 @@
 *           On entry, UPLO specifies whether the matrix A is an upper or
 *           lower triangular matrix as follows:
 *
-*              UPLO = 'U' or 'u'   A is an upper triangular matrix.
+*              UPLO = 1 --> 'U' or 'u'   A is an upper triangular matrix.
 *
-*              UPLO = 'L' or 'l'   A is a lower triangular matrix.
+*              UPLO = 2 --> 'L' or 'l'   A is a lower triangular matrix.
 *
 *           Unchanged on exit.
 *
@@ -50,11 +51,11 @@
 *           On entry, TRANSA specifies the form of op( A ) to be used in
 *           the matrix multiplication as follows:
 *
-*              TRANSA = 'N' or 'n'   op( A ) = A.
+*              TRANSA = 1 --> 'N' or 'n'   op( A ) = A.
 *
-*              TRANSA = 'T' or 't'   op( A ) = A**T.
+*              TRANSA = 2 --> 'T' or 't'   op( A ) = A**T.
 *
-*              TRANSA = 'C' or 'c'   op( A ) = A**T.
+*              TRANSA = 3 --> 'C' or 'c'   op( A ) = A**T.
 *
 *           Unchanged on exit.
 *
@@ -62,9 +63,9 @@
 *           On entry, DIAG specifies whether or not A is unit triangular
 *           as follows:
 *
-*              DIAG = 'U' or 'u'   A is assumed to be unit triangular.
+*              DIAG = 1 --> 'U' or 'u'   A is assumed to be unit triangular.
 *
-*              DIAG = 'N' or 'n'   A is not assumed to be unit
+*              DIAG = 2 --> 'N' or 'n'   A is not assumed to be unit
 *                                  triangular.
 *
 *           Unchanged on exit.
@@ -153,25 +154,34 @@
 *
 *     Test the input parameters.
 *
-      LSIDE = LSAME(SIDE,'L')
+*!      LSIDE = LSAME(SIDE,'L')
+      LSIDE = SIDE == 1
       IF (LSIDE) THEN
           NROWA = M
       ELSE
           NROWA = N
       END IF
-      NOUNIT = LSAME(DIAG,'N')
-      UPPER = LSAME(UPLO,'U')
+*!      NOUNIT = LSAME(DIAG,'N')
+      NOUNIT = DIAG == 2
+*!      UPPER = LSAME(UPLO,'U')
+      UPPER = UPLO == 1
 *
       INFO = 0
-      IF ((.NOT.LSIDE) .AND. (.NOT.LSAME(SIDE,'R'))) THEN
+*!      IF ((.NOT.LSIDE) .AND. (.NOT.LSAME(SIDE,'R'))) THEN
+      IF ((.NOT.LSIDE) .AND. (.NOT. SIDE == 2)) THEN
           INFO = 1
-      ELSE IF ((.NOT.UPPER) .AND. (.NOT.LSAME(UPLO,'L'))) THEN
+*!      ELSE IF ((.NOT.UPPER) .AND. (.NOT.LSAME(UPLO,'L'))) THEN
+      ELSE IF ((.NOT.UPPER) .AND. (.NOT.UPLO == 2)) THEN
           INFO = 2
-      ELSE IF ((.NOT.LSAME(TRANSA,'N')) .AND.
-     +         (.NOT.LSAME(TRANSA,'T')) .AND.
-     +         (.NOT.LSAME(TRANSA,'C'))) THEN
+*!      ELSE IF ((.NOT.LSAME(TRANSA,'N')) .AND.
+*!     +         (.NOT.LSAME(TRANSA,'T')) .AND.
+*!     +         (.NOT.LSAME(TRANSA,'C'))) THEN
+      ELSE IF ((.NOT.TRANSA==1) .AND.
+     +         (.NOT.TRANSA==2) .AND.
+     +         (.NOT.TRANSA==3)) THEN
           INFO = 3
-      ELSE IF ((.NOT.LSAME(DIAG,'U')) .AND. (.NOT.LSAME(DIAG,'N'))) THEN
+*!      ELSE IF ((.NOT.LSAME(DIAG,'U')) .AND. (.NOT.LSAME(DIAG,'N'))) THEN
+      ELSE IF ((.NOT.DIAG == 1) .AND. (.NOT.DIAG == 2)) THEN
           INFO = 4
       ELSE IF (M.LT.0) THEN
           INFO = 5
@@ -189,7 +199,7 @@
 *
 *     Quick return if possible.
 *
-      IF (M.EQ.0 .OR. N.EQ.0) RETURN
+*!      IF (M.EQ.0 .OR. N.EQ.0) RETURN
 *
 *     And when  alpha.eq.zero.
 *
@@ -205,7 +215,7 @@
 *     Start the operations.
 *
       IF (LSIDE) THEN
-          IF (LSAME(TRANSA,'N')) THEN
+          IF (TRANSA == 1) THEN
 *
 *           Form  B := alpha*inv( A )*B.
 *
@@ -271,7 +281,7 @@
               END IF
           END IF
       ELSE
-          IF (LSAME(TRANSA,'N')) THEN
+          IF (TRANSA == 1) THEN
 *
 *           Form  B := alpha*B*inv( A ).
 *

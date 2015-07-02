@@ -33,39 +33,62 @@ module network
   integer, parameter :: nspec = 3
   integer, parameter :: nspec_advance = 1
   integer, parameter :: naux  = 0
+  !$acc declare copyin(nspec, nspec_advance, naux)
 
-  character (len=16), parameter :: spec_names(nspec) = [& 
+  character (len=16), allocatable :: spec_names(:)
+  !$acc declare create(spec_names)
+
+  character (len= 5), allocatable :: short_spec_names(:)
+  !$acc declare create(short_spec_names)
+
+  real(kind=dp_t), allocatable :: aion(:)
+  !$acc declare create(aion)
+  
+  real(kind=dp_t), allocatable :: zion(:)
+  !$acc declare create(zion)
+  
+  real(kind=dp_t), allocatable :: ebin(:)
+  !$acc declare create(ebin)
+
+contains
+  
+  subroutine network_initialize()
+    allocate(spec_names(nspec))
+    spec_names = [& 
     "carbon-12       ",&
     "oxygen-16       ",&
     "magnesium-24    "]
+    !!$acc update device(spec_names)
 
-  character (len= 5), parameter :: short_spec_names(nspec) = [&
+    allocate(short_spec_names(nspec))
+    short_spec_names = [&
     "C12  ",&
     "O16  ",&
     "Mg24 "]
+    !!$acc update device(short_spec_names)
 
-  real(kind=dp_t), parameter :: aion(nspec) = [&
+    allocate(aion(nspec))
+    aion = [&
     12.0_dp_t,&
     16.0_dp_t,&
     24.0_dp_t]
-  
-  real(kind=dp_t), parameter :: zion(nspec) = [&
+    !$acc update device(aion)
+
+    allocate(zion(nspec))
+    zion = [&
     6.0_dp_t,& 
     8.0_dp_t,& 
     12.0_dp_t]
+    !$acc update device(zion)
 
-  
-  real(kind=dp_t), parameter :: ebin(nspec) = [&
+    allocate(ebin(nspec))
+    ebin = [&
     -7.4103097e18_dp_t,&     !  92.16294 MeV
     -7.6959672e18_dp_t,&     ! 127.62093 MeV
-    -7.9704080e18_dp_t]     ! 198.2579  MeV
+    -7.9704080e18_dp_t]      ! 198.2579  MeV
+    !$acc update device(ebin)
+  end subroutine network_initialize
 
-  !$acc declare copyin(short_spec_names, aion, zion, ebin) 
-  !$acc declare copyin(network_name, nspec, nspec_advance, naux)
-  !$acc declare copyin(spec_names) 
-  
-contains
-  
   function network_species_index(name) result(r)
 
     character(len=*) :: name

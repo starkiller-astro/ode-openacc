@@ -63,7 +63,7 @@ OBJECTS += $(addprefix $(odir)/, $(FSOURCES:.f=.o))
 
 # targets for cleaning up
 clean:
-	rm -f $(odir)/*.o $(odir)/*.mod
+	rm -f $(odir)/*.o $(odir)/*.mod *.cub *.ptx
 
 realclean: clean
 	rm -f $(odir)/deps
