@@ -36,10 +36,12 @@ module network
   !$acc declare copyin(nspec, nspec_advance, naux)
 
   character (len=16), allocatable :: spec_names(:)
-  !$acc declare create(spec_names)
+  !TODO: Commented out because compilers 
+  !      don't like Fortran character arrays on GPUs
+  !!$acc declare create(spec_names)
 
   character (len= 5), allocatable :: short_spec_names(:)
-  !$acc declare create(short_spec_names)
+  !!$acc declare create(short_spec_names)
 
   real(kind=dp_t), allocatable :: aion(:)
   !$acc declare create(aion)
@@ -58,14 +60,14 @@ contains
     "carbon-12       ",&
     "oxygen-16       ",&
     "magnesium-24    "]
-    !$acc update device(spec_names)
+    !!$acc update device(spec_names)
 
     allocate(short_spec_names(nspec))
     short_spec_names = [&
     "C12  ",&
     "O16  ",&
     "Mg24 "]
-    !$acc update device(short_spec_names)
+    !!$acc update device(short_spec_names)
 
     allocate(aion(nspec))
     aion = [&

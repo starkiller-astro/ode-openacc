@@ -1,6 +1,7 @@
       SUBROUTINE DGETRS( TRANS, N, NRHS, A, LDA, IPIV, B, LDB, INFO )
 !$acc routine seq
 !$acc routine(DLASWP) seq
+!$acc routine(DTRSM) seq
 *
 *  -- LAPACK routine (version 3.3.1) --
 *  -- LAPACK is a software package provided by Univ. of Tennessee,    --
@@ -72,8 +73,8 @@
       LOGICAL            NOTRAN
 *     ..
 *     .. External Functions ..
-      LOGICAL            LSAME
-      EXTERNAL           LSAME
+*      LOGICAL            LSAME
+*      EXTERNAL           LSAME
 *     ..
 *     .. External Subroutines ..
       EXTERNAL           DLASWP, DTRSM, XERBLA
@@ -107,8 +108,8 @@
 *
 *     Quick return if possible
 *
-      IF( N.EQ.0 .OR. NRHS.EQ.0 )
-     $   RETURN
+*      IF( N.EQ.0 .OR. NRHS.EQ.0 )
+*     $   RETURN
 *
       IF( NOTRAN ) THEN
 *
@@ -120,12 +121,14 @@
 *
 *        Solve L*X = B, overwriting B with X.
 *
-         CALL DTRSM( 'Left', 'Lower', 'No transpose', 'Unit', N, NRHS,
+*!         CALL DTRSM( 'Left', 'Lower', 'No transpose', 'Unit', N, NRHS,
+         CALL DTRSM( 1, 2, 1, 1, N, NRHS,
      $               ONE, A, LDA, B, LDB )
 *
 *        Solve U*X = B, overwriting B with X.
 *
-         CALL DTRSM( 'Left', 'Upper', 'No transpose', 'Non-unit', N,
+*!         CALL DTRSM( 'Left', 'Upper', 'No transpose', 'Non-unit', N,
+         CALL DTRSM( 1, 1, 1, 2, N,
      $               NRHS, ONE, A, LDA, B, LDB )
       ELSE
 *
@@ -133,12 +136,14 @@
 *
 *        Solve U**T *X = B, overwriting B with X.
 *
-         CALL DTRSM( 'Left', 'Upper', 'Transpose', 'Non-unit', N, NRHS,
+*!         CALL DTRSM( 'Left', 'Upper', 'Transpose', 'Non-unit', N, NRHS,
+         CALL DTRSM( 1, 1, 2, 2, N, NRHS,
      $               ONE, A, LDA, B, LDB )
 *
 *        Solve L**T *X = B, overwriting B with X.
 *
-         CALL DTRSM( 'Left', 'Lower', 'Transpose', 'Unit', N, NRHS, ONE,
+*!         CALL DTRSM( 'Left', 'Lower', 'Transpose', 'Unit', N, NRHS, ONE,
+         CALL DTRSM( 1, 2, 2, 1, N, NRHS, ONE,
      $               A, LDA, B, LDB )
 *
 *        Apply row interchanges to the solution vectors.

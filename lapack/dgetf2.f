@@ -1,10 +1,10 @@
       SUBROUTINE DGETF2( M, N, A, LDA, IPIV, INFO )
 !$acc routine seq
-!$acc routine(dlamch) seq
-!$acc routine(idamax) seq
-!$acc routine(dger) seq
-!$acc routine(dscal) seq
-!$acc routine(dswap) seq
+!$acc routine(DLAMCH) seq
+!$acc routine(IDAMAX) seq
+!$acc routine(DGER) seq
+!$acc routine(DSCAL) seq
+!$acc routine(DSWAP) seq
 *
 *  -- LAPACK routine (version 3.2) --
 *  -- LAPACK is a software package provided by Univ. of Tennessee,    --
