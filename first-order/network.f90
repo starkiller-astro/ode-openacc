@@ -74,21 +74,24 @@ contains
     12.0_dp_t,&
     16.0_dp_t,&
     24.0_dp_t]
-    !$acc update device(aion)
+    !!$acc update device(aion)
+    !$acc enter data copyin(aion)
 
     allocate(zion(nspec))
     zion = [&
     6.0_dp_t,& 
     8.0_dp_t,& 
     12.0_dp_t]
-    !$acc update device(zion)
+    !!$acc update device(zion)
+    !$acc enter data copyin(zion)
 
     allocate(ebin(nspec))
     ebin = [&
     -7.4103097e18_dp_t,&     !  92.16294 MeV
     -7.6959672e18_dp_t,&     ! 127.62093 MeV
     -7.9704080e18_dp_t]      ! 198.2579  MeV
-    !$acc update device(ebin)
+    !!$acc update device(ebin)
+    !$acc enter data copyin(ebin)
   end subroutine network_initialize
 
   function network_species_index(name) result(r)

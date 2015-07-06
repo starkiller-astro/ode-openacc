@@ -52,9 +52,9 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
   !Start OpenACC here.  This is about where we would want to start it for a
   !higher order, vectorized integrator.  
   !Note: print statements don't play nice with GPUs, so
-  !they're commented out.
+  !      they're commented out.
 
-  !$acc parallel
+  !$acc parallel 
 
   ! get an estimate of the timestep by looking at the RHS
   ! dt = min{X/(dX/dt)}
@@ -157,5 +157,4 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
   Xout(:) = X_n(:)
 
   !$acc end parallel
-  !End OpenACC here
 end subroutine react
