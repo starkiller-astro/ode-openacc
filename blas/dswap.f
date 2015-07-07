@@ -28,7 +28,7 @@
 *     .. Intrinsic Functions ..
       INTRINSIC MOD
 *     ..
-      IF (N.LE.0) RETURN
+*      IF (N.LE.0) RETURN
       IF (INCX.EQ.1 .AND. INCY.EQ.1) THEN
 *
 *       code for both increments equal to 1
@@ -64,8 +64,9 @@
 *
          IX = 1
          IY = 1
-         IF (INCX.LT.0) IX = (-N+1)*INCX + 1
-         IF (INCY.LT.0) IY = (-N+1)*INCY + 1
+*!         IF (INCX.LT.0) IX = (-N+1)*INCX + 1
+*!         IF (INCY.LT.0) IY = (-N+1)*INCY + 1
+*!         TODO: does removing these break things? PGI compiler doesn't like'em.
          DO I = 1,N
             DTEMP = DX(IX)
             DX(IX) = DY(IY)

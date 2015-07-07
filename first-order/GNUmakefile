@@ -13,5 +13,5 @@ include ../GMake.common
 test_react: $(OBJECTS)
 	@echo " "
 	@echo "Linking..."
-	$(wrapper) -o test_react $(OBJECTS)
+	$(link) -o test_react $(OBJECTS)
 

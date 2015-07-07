@@ -14,6 +14,7 @@ module bl_types
 
   ! integer, parameter :: dp_t = kind(0.0d0)
   integer, parameter, public :: dp_t = selected_real_kind(15,307)
+  !$acc declare copyin(dp_t)
 
   !! Single precision floating point data are declared as
   !! REAL(kind=sp_t), or simply as REAL.

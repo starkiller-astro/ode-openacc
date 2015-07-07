@@ -29,14 +29,17 @@ ifeq ($(FC),gfortran)
   FFLAGS := -c -O2 -g -fbounds-check -fbacktrace -Wuninitialized -Wunused -ffpe-trap=invalid -finit-real=nan
   FFLAGS += -J $(odir) -I $(odir)
   wrapper := $(FC)
+  link := $(wrapper)
 
 else ifeq ($(FC),pgf95)
   FFLAGS := -c -fast -acc -ta=nvidia -lcudart -Minfo -module $(odir) -I$(odir) 
   wrapper := ftn
+  link := ftn -acc -ta=nvidia
 
 else ifeq ($(FC),Cray)
   FFLAGS := -c -h acc,msgs -lcudart -em  -J $(odir) -I $(odir) 
   wrapper := ftn
+  link := ftn -h acc,msgs -lcudart
 
 else
   $(error ERROR: compiler $(FC) invalid)

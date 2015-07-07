@@ -17,6 +17,7 @@ module bl_constants_module
   real(kind = dp_t), parameter :: EIGHT   =  8.0_dp_t
   real(kind = dp_t), parameter :: NINE    =  9.0_dp_t
   real(kind = dp_t), parameter :: TEN     = 10.0_dp_t
+  !$acc declare copyin(ONE)
 
   real(kind = dp_t), parameter :: ELEVEN  = 11.0_dp_t
   real(kind = dp_t), parameter :: TWELVE  = 12.0_dp_t

@@ -31,7 +31,7 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
   double precision :: A(nspec, nspec), J(nspec, nspec), b(nspec)
   integer :: info
   
-  double precision, parameter :: eps = 1.d-8
+  double precision :: eps = 1.d-8
 
   double precision :: rpar(n_rpar_comps)
   integer :: ipar
@@ -40,8 +40,8 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
 
   integer :: ic12, io16
 
-  double precision, parameter :: tol = 1.d-6
-  integer, parameter :: max_iter = 10
+  double precision :: tol = 1.d-6
+  integer :: max_iter = 10
   integer :: iter
   logical :: converged
  
@@ -54,7 +54,13 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
   !Note: print statements don't play nice with GPUs, so
   !      they're commented out.
 
-  !$acc parallel 
+  !$acc data create(dXdt, X1, X2, dX1dt, dX2dt, X_n, X_np1, dX, dfdX, A, J, b) &
+  !$acc create(info, ipiv, rpar, ipar)                                         &
+  !$acc copyin(Xin, T, rho, tmax, eps, tol, max_iter, ic12, io16)              &
+  !$acc copyout(Xout)                                                          &
+  !$acc copy(ierr)
+
+  !$acc parallel default(none) private(m,n,iter,I,time,dt,converged)
 
   ! get an estimate of the timestep by looking at the RHS
   ! dt = min{X/(dX/dt)}
@@ -157,4 +163,5 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
   Xout(:) = X_n(:)
 
   !$acc end parallel
+  !$acc end data
 end subroutine react
