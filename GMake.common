@@ -69,7 +69,7 @@ clean:
 	rm -f $(odir)/*.o $(odir)/*.mod *.cub *.ptx
 
 realclean: clean
-	rm -f $(odir)/deps
+	rm -f $(odir)/deps *.cub *.ptx
 	@if [ -d $(odir) ]; then rmdir $(odir); echo "removing $(odir)"; fi
 	rm -f test_react
 
