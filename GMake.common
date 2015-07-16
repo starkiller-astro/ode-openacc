@@ -33,8 +33,9 @@ ifeq ($(FC),gfortran)
 
 else ifeq ($(FC),pgf95)
   FFLAGS := -c -fast -acc -ta=nvidia -lcudart -Minfo -module $(odir) -I$(odir) 
-  wrapper := ftn
-  link := ftn -acc -ta=nvidia
+  #wrapper := ftn
+  wrapper := pgf95
+  link := $(wrapper) -acc -ta=nvidia
 
 else ifeq ($(FC),Cray)
   FFLAGS := -c -h acc,msgs -lcudart -em  -J $(odir) -I $(odir) 

@@ -3,6 +3,7 @@ program main
   use network
 
   implicit none
+  !$acc routine(react) seq
 
   double precision :: Xin(nspec), Xout(nspec)
   double precision :: rho, temp

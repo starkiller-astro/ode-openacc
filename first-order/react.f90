@@ -4,7 +4,7 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
   use rpar_indices
 
   implicit none
-
+  !$acc routine seq
   !$acc routine(rhs) seq
   !$acc routine(dgesv) seq
   
@@ -46,21 +46,8 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
   logical :: converged
  
   ierr = 0 
-  ic12 = network_species_index("carbon-12")
-  io16 = network_species_index("oxygen-16")
-
-  !Start OpenACC here.  This is about where we would want to start it for a
-  !higher order, vectorized integrator.  
-  !Note: print statements don't play nice with GPUs, so
-  !      they're commented out.
-
-  !$acc data create(dXdt, X1, X2, dX1dt, dX2dt, X_n, X_np1, dX, dfdX, A, J, b) &
-  !$acc create(info, ipiv, rpar, ipar)                                         &
-  !$acc copyin(Xin, T, rho, tmax, eps, tol, max_iter, ic12, io16)              &
-  !$acc copyout(Xout)                                                          &
-  !$acc copy(ierr)
-
-  !$acc parallel default(none) private(m,n,iter,I,time,dt,converged)
+  ic12 = ic12_
+  io16 = io16_
 
   ! get an estimate of the timestep by looking at the RHS
   ! dt = min{X/(dX/dt)}
@@ -161,7 +148,4 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
   enddo
 
   Xout(:) = X_n(:)
-
-  !$acc end parallel
-  !$acc end data
 end subroutine react
