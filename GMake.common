@@ -33,14 +33,19 @@ ifeq ($(FC),gfortran)
 
 else ifeq ($(FC),pgf95)
   FFLAGS := -c -fast -acc -ta=nvidia -lcudart -Minfo -module $(odir) -I$(odir) 
-  #wrapper := ftn
+  wrapper := ftn
+  link := $(wrapper) -acc -ta=nvidia
+
+else ifeq ($(FC),pgf95_local)
+  FFLAGS := -c -fast -acc -ta=nvidia -lcudart -Minfo -module $(odir) -I$(odir) 
+  #FFLAGS := -c -g -acc -ta=nvidia -lcudart -Minfo -module $(odir) -I$(odir) 
   wrapper := pgf95
   link := $(wrapper) -acc -ta=nvidia
 
 else ifeq ($(FC),Cray)
   FFLAGS := -c -h acc,msgs -lcudart -em  -J $(odir) -I $(odir) 
   wrapper := ftn
-  link := ftn -h acc,msgs -lcudart
+  link := $(wrapper) -h acc,msgs -lcudart
 
 else
   $(error ERROR: compiler $(FC) invalid)

@@ -13,14 +13,12 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
   ! our convention is that y(1:nspec) are the species (in the same
   ! order as defined in network.f90, and y(nspec+1) is the temperature
   integer,         intent(in   ) :: n, ipar
-  real(kind=dp_t), intent(in   ) :: y(n)
+  real(kind=dp_t), intent(in   ) :: y(n), t
   real(kind=dp_t), intent(  out) :: ydot(n)
   real(kind=dp_t), intent(inout) :: rpar(*)
 
   integer :: k
   real(kind=dp_t) :: ymass(nspec)
-
-  real(kind=dp_t) :: t
 
   real(kind=dp_t) :: dens, X_O16
   real(kind=dp_t) :: temp, T9, T9a, dT9dt, dT9adt

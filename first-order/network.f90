@@ -54,7 +54,7 @@ module network
 
 contains
   
-  subroutine network_initialize()
+  subroutine network_init()
     allocate(spec_names(nspec))
     spec_names = [& 
     "carbon-12       ",&
@@ -92,7 +92,7 @@ contains
     -7.9704080e18_dp_t]      ! 198.2579  MeV
     !$acc update device(ebin)
     !!$acc enter data copyin(ebin)
-  end subroutine network_initialize
+  end subroutine network_init
 
   function network_species_index(name) result(r)
 
