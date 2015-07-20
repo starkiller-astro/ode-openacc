@@ -15,7 +15,7 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
   integer,         intent(in   ) :: n, ipar
   real(kind=dp_t), intent(in   ) :: y(n), t
   real(kind=dp_t), intent(  out) :: ydot(n)
-  real(kind=dp_t), intent(inout) :: rpar(*)
+  real(kind=dp_t), intent(inout) :: rpar(:)
 
   integer :: k
   real(kind=dp_t) :: ymass(nspec)
@@ -54,21 +54,21 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
 
   
   ! compute some often used temperature constants
-  T9     = temp/1.d9
-  dT9dt  = ONE/1.d9
-  T9a    = T9/(1.0d0 + 0.0396d0*T9)
-  dT9adt = (T9a / T9 - (T9a / (1.0d0 + 0.0396d0*T9)) * 0.0396d0) * dT9dt
+  T9     = temp/1.e9_dp_t
+  dT9dt  = ONE/1.e9_dp_t
+  T9a    = T9/(1.0e0_dp_t + 0.0396e0_dp_t*T9)
+  dT9adt = (T9a / T9 - (T9a / (1.0e0_dp_t + 0.0396e0_dp_t*T9)) * 0.0396e0_dp_t) * dT9dt
 
   ! compute the CF88 rate
   scratch    = T9a**one_third
-  dscratchdt = one_third * T9a**(-2.0d0 * one_third) * dT9adt
+  dscratchdt = one_third * T9a**(-2.0e0_dp_t * one_third) * dT9adt
 
-  a       = 4.27d26*T9a**five_sixths*T9**(-1.5d0)
-  dadt    = five_sixths * (a/T9a) * dT9adt - 1.5d0 * (a/T9) * dT9dt
+  a       = 4.27e26_dp_t*T9a**five_sixths*T9**(-1.5e0_dp_t)
+  dadt    = five_sixths * (a/T9a) * dT9adt - 1.5e0_dp_t * (a/T9) * dT9dt
 
-  b       = dexp(-84.165d0/scratch - 2.12d-3*T9*T9*T9)
-  dbdt    = (84.165d0 * dscratchdt/ scratch**2.0d0                            &
-             - 3.0d0 * 2.12d-3 * T9 * T9 * dT9dt) * b
+  b       = dexp(-84.165e0_dp_t/scratch - 2.12e-3_dp_t*T9*T9*T9)
+  dbdt    = (84.165e0_dp_t * dscratchdt/ scratch**2.0e0_dp_t                   &
+             - 3.0e0_dp_t * 2.12e-3_dp_t * T9 * T9 * dT9dt) * b
 
   rate    = a *  b
   dratedt = dadt * b + a * dbdt
@@ -102,9 +102,9 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
   ! the network module -- this makes things robust to a shuffling of the 
   ! species ordering
 
-  xc12tmp = max(y(ic12_),0.d0)
+  xc12tmp = max(y(ic12_),0.e0_dp_t)
   ydot(ic12_) = -one_twelvth*dens*sc1212*rate*xc12tmp**2
-  ydot(io16_) = 0.0d0
+  ydot(io16_) = 0.0e0_dp_t
   ydot(img24_) = -ydot(ic12_)
 
   return

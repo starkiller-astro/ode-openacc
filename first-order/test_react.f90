@@ -5,9 +5,9 @@ program main
 
   implicit none
 
-  !integer, parameter :: NPTS = 8192 ! this is the number of hydro cells
+  integer, parameter :: NPTS = 8192 ! this is the number of hydro cells
   !integer, parameter :: NPTS = 16384 ! this is the number of hydro cells
-  integer, parameter :: NPTS = 32768 ! this is the number of hydro cells
+  !integer, parameter :: NPTS = 32768 ! this is the number of hydro cells
 
   real(kind=dp_t) :: Xin(nspec, NPTS), Xout(nspec, NPTS)
   real(kind=dp_t) :: rho(NPTS), temp(NPTS)

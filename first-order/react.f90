@@ -6,7 +6,7 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
    use bl_constants_module
 
    implicit none
-   !$acc routine(rhs) seq
+   !!$acc routine(rhs) seq
    !$acc routine(dgesv) seq
    
    ! do a simple first-order backward Euler method for integrating
@@ -17,11 +17,12 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
 
    interface
       subroutine rhs(n, t, y, ydot, rpar, ipar)
+         !$acc routine seq
          import dp_t
          integer,         intent(in   ) :: n, ipar
          real(kind=dp_t), intent(in   ) :: y(n), t
          real(kind=dp_t), intent(  out) :: ydot(n)
-         real(kind=dp_t), intent(inout) :: rpar(*)
+         real(kind=dp_t), intent(inout) :: rpar(:)
       end subroutine rhs
    end interface
    real(kind=dp_t), intent(in)  :: Xin(:,:), T(:), rho(:), tmax
@@ -92,22 +93,23 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
       rpar(irp_temp) = T(p)
       rpar(irp_o16) = Xin(io16,p)
 
-      call rhs(nspec, ZERO, Xin(:,p), dXdt, rpar, ipar)
+      X_n(:) = Xin(:,p)
+      
+      call rhs(nspec, ZERO, X_n, dXdt, rpar, ipar)
       !print *, p, ': dXdt = ', dXdt
+      scratch(p) = dXdt(1)
+
 
       dt = 1.d33
       dt = 0.1*min(dt, abs(Xin(ic12,p)/dXdt(ic12)))
       
       !print *, p, ': dt = ', dt
 
-      X_n(:) = Xin(:,p)
-      
       ! do the integration
       time = ZERO
       do while (time < tmax)
 
          !print *, p, ': t = ', time
-         scratch(p) = time
 
          converged = .false.
 
@@ -193,7 +195,7 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
    !$acc end kernels
    !$acc end data
 
-   !do p = 1, npts
-   !   print *, p, ': time = ', scratch(p) 
-   !enddo
+   do p = 1, npts
+      print *, p, ': J(1,1) = ', scratch(p) 
+   enddo
 end subroutine react
