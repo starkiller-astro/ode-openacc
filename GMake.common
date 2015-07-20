@@ -37,7 +37,9 @@ else ifeq ($(FC),pgf95)
   link := $(wrapper) -acc -ta=nvidia
 
 else ifeq ($(FC),pgf95_local)
-  FFLAGS := -c -fast -acc -ta=nvidia -lcudart -Minfo -module $(odir) -I$(odir) 
+  FFLAGS := -c -fast -acc -ta=nvidia -lcudart -mcmodel=medium -Minfo -module $(odir) -I$(odir) 
+  #FFLAGS := -c -fast -mp -lpthread -Mvect=levels:4 -Minfo -module $(odir) -I$(odir) 
+  #FFLAGS := -c -fast -Minfo -module $(odir) -I$(odir) 
   #FFLAGS := -c -g -acc -ta=nvidia -lcudart -Minfo -module $(odir) -I$(odir) 
   wrapper := pgf95
   link := $(wrapper) -acc -ta=nvidia

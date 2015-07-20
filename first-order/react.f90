@@ -82,6 +82,9 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
    !$acc private(m,n,iter,I,time,dt,converged)                                 &
    !$acc private(dXdt, X1, X2, dX1dt, dX2dt, X_n, X_np1, dX, A, J, b)          &
    !$acc private(info, ipiv, rpar, ipar) 
+   !$omp parallel do private(m,n,iter,I,time,dt,converged)                     &
+   !$omp private(dXdt, X1, X2, dX1dt, dX2dt, X_n, X_np1, dX, A, J, b)          &
+   !$omp private(info, ipiv, rpar, ipar)
    do p=1, npts
       ! get an estimate of the timestep by looking at the RHS
       ! dt = min{X/(dX/dt)}
@@ -184,12 +187,13 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
 
       Xout(:,p) = X_n(:)
    enddo
+   !$omp end parallel do
 
    !!$acc end parallel
    !$acc end kernels
    !$acc end data
 
-   do p = 1, npts
-      print *, p, ': time = ', scratch(p) 
-   enddo
+   !do p = 1, npts
+   !   print *, p, ': time = ', scratch(p) 
+   !enddo
 end subroutine react

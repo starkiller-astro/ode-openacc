@@ -5,11 +5,13 @@ program main
 
   implicit none
 
-  integer, parameter :: NPTS = 8192 ! this is the number of hydro cells
+  !integer, parameter :: NPTS = 8192 ! this is the number of hydro cells
+  !integer, parameter :: NPTS = 16384 ! this is the number of hydro cells
+  integer, parameter :: NPTS = 32768 ! this is the number of hydro cells
 
   real(kind=dp_t) :: Xin(nspec, NPTS), Xout(nspec, NPTS)
   real(kind=dp_t) :: rho(NPTS), temp(NPTS)
-  real(kind=dp_t) :: tmax
+  real(kind=dp_t) :: tmax, strt, stp 
 
   integer :: ic12, io16, ierr
 
@@ -39,10 +41,13 @@ program main
   rho(:) = 2.6e9
   tmax = 1000.0
 
+  call cpu_time(strt)
   call react(Xin, temp, rho, tmax, Xout, ierr)
+  call cpu_time(stp)
 
   print *, ierr
   print *, Xout(:,1)
+  print *, 'runtime: ', stp - strt, ' seconds'
   !print *, Xout(:,224)
 
 end program main
