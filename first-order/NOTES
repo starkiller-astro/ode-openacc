@@ -21,7 +21,7 @@ maxtrix vector multiply: blas level-2: dgemv
 
 ---
 Modules that must be loaded before compiling:
-craype-accel-nvidia35 (for Cray compiler only)
+craype-accel-nvidia35 (for Cray compiler only, will also load cudatoolkit)
 cudatoolkit
 PrgEnv-pgi or PrgEnv-cray
 

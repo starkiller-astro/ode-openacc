@@ -70,10 +70,11 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
 
    !$acc data copyin(Xin, T, rho, tmax, eps, tol, max_iter, ic12, io16)        &
    !$acc copyout(Xout)                                                         &
-   !$acc copy(ierr, scratch)
+   !$acc copy(ierr)
 
    !!$acc parallel default(none)                                               &
-   !$acc kernels default(none)                                                 
+   !!$acc kernels default(none)                                                 
+   !$acc kernels
    !!$acc private(m,n,iter,I,time,dt,converged)                                 &
    !!$acc private(dXdt, X1, X2, dX1dt, dX2dt, X_n, X_np1, dX, A, J, b)          &
    !!$acc private(info, ipiv, rpar, ipar)                                       
@@ -83,9 +84,9 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
    !$acc private(m,n,iter,I,time,dt,converged)                                 &
    !$acc private(dXdt, X1, X2, dX1dt, dX2dt, X_n, X_np1, dX, A, J, b)          &
    !$acc private(info, ipiv, rpar, ipar) 
-   !$omp parallel do private(m,n,iter,I,time,dt,converged)                     &
-   !$omp private(dXdt, X1, X2, dX1dt, dX2dt, X_n, X_np1, dX, A, J, b)          &
-   !$omp private(info, ipiv, rpar, ipar)
+   !!$omp parallel do private(m,n,iter,I,time,dt,converged)                     &
+   !!$omp private(dXdt, X1, X2, dX1dt, dX2dt, X_n, X_np1, dX, A, J, b)          &
+   !!$omp private(info, ipiv, rpar, ipar)
    do p=1, npts
       ! get an estimate of the timestep by looking at the RHS
       ! dt = min{X/(dX/dt)}
@@ -97,7 +98,7 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
       
       call rhs(nspec, ZERO, X_n, dXdt, rpar, ipar)
       !print *, p, ': dXdt = ', dXdt
-      scratch(p) = dXdt(1)
+      !scratch(p) = dXdt(1)
 
 
       dt = 1.d33
@@ -189,13 +190,10 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
 
       Xout(:,p) = X_n(:)
    enddo
-   !$omp end parallel do
+   !!$omp end parallel do
 
    !!$acc end parallel
    !$acc end kernels
    !$acc end data
 
-   do p = 1, npts
-      print *, p, ': J(1,1) = ', scratch(p) 
-   enddo
 end subroutine react
