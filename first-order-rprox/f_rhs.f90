@@ -33,7 +33,6 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
 
   ymol = y(1:nspec)/aion(1:nspec)
 
-
   ! build the rates; weak rates are the wk* variables
   call make_rates(t9, dens, ymol, rpar)
 
