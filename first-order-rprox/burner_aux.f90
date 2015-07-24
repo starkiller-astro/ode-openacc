@@ -4,7 +4,7 @@ module rpar_indices
 
   implicit none
 
-  integer, save :: n_rpar_comps = 11 + nrat
+  integer, parameter :: n_rpar_comps = 11 + nrat
 
   integer, parameter :: irp_dens = 1
   integer, parameter :: irp_temp = 2
