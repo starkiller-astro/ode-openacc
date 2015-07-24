@@ -1,16 +1,23 @@
 #FC := gfortran
 FC := pgf95
 
-ALL: test_react
+ACC :=
 
-SRC_DIRS := . ../lapack/ ../blas/
+include ../GMake.defs
+
+programs += test_react
+
+ALL: $(pnames)
+
+
+SRC_DIRS := . ../lapack/ ../blas/ ../boxlib/
 
 include ../GMake.common
 
 
 # default target -- this is the executable
-test_react: $(OBJECTS)
+%.$(suf).exe: $(OBJECTS)
 	@echo " "
 	@echo "Linking..."
-	$(wrapper) -o test_react $(OBJECTS)
+	$(link) -o $@ $(OBJECTS)
 

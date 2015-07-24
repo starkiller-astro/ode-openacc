@@ -1,53 +1,26 @@
 module rpar_indices
 
+  use network, only : nrat
+
   implicit none
 
-  integer, save :: n_rpar_comps = 0
+  integer, save :: n_rpar_comps = 11 + nrat
 
-  integer, save :: irp_dens, irp_temp, & 
-                   irp_rates, &
-                   irp_dlambCNOdh1, irp_drs1dhe4, irp_drr1dh1, &
-                   irp_dlambda1dhe4, irp_dlambda2dhe4, &
-                   irp_delta1, irp_delta2, irp_r56eff, irp_dr56effdt
-
-contains
-
-  function get_next_rpar_index(num) result (next)
-
-    ! return the next starting index for a plotfile quantity,
-    ! and increment the counter of plotfile quantities by num
-    integer :: num, next
-
-    next = n_rpar_comps + 1
-    n_rpar_comps = n_rpar_comps + num
-
-    return
-  end function get_next_rpar_index
-
-
-  subroutine init_rpar_indices(nrat, nspec)
-
-    integer, intent(in) :: nrat, nspec
-
-    irp_dens  = get_next_rpar_index(1)
-    irp_temp  = get_next_rpar_index(1)    
-
-    !============================================================
-    ! only rate-related things below this point
-    irp_rates = get_next_rpar_index(nrat)
-
-    irp_dlambCNOdh1 = get_next_rpar_index(1)
-    irp_drs1dhe4 = get_next_rpar_index(1)
-    irp_drr1dh1 = get_next_rpar_index(1)
-    irp_dlambda1dhe4 = get_next_rpar_index(1)
-    irp_dlambda2dhe4 = get_next_rpar_index(1)
-
-    irp_delta1 = get_next_rpar_index(1)
-    irp_delta2 = get_next_rpar_index(1)
-
-    irp_r56eff = get_next_rpar_index(1)
-    irp_dr56effdt = get_next_rpar_index(1)
-
-  end subroutine init_rpar_indices
-
+  integer, parameter :: irp_dens = 1
+  integer, parameter :: irp_temp = 2
+  integer, parameter :: irp_dlambCNOdh1 = 3
+  integer, parameter :: irp_drs1dhe4 = 4
+  integer, parameter :: irp_drr1dh1 = 5
+  integer, parameter :: irp_dlambda1dhe4 = 6
+  integer, parameter :: irp_dlambda2dhe4 = 7
+  integer, parameter :: irp_delta1 = 8
+  integer, parameter :: irp_delta2 = 9
+  integer, parameter :: irp_r56eff = 10
+  integer, parameter :: irp_dr56effdt = 11
+  integer, parameter :: irp_rates = 12 ! nrat components
+  !$acc declare copyin(n_rpar_comps, irp_dens, irp_temp)
+  !$acc declare copyin(irp_dlambCNOdh1, irp_drs1dhe4)
+  !$acc declare copyin(irp_drr1dh1, irp_dlambda1dhe4, irp_dlambda2dhe4)
+  !$acc declare copyin(irp_delta1, irp_delta2, irp_r56eff)
+  !$acc declare copyin(irp_dr56effdt, irp_rates)
 end module rpar_indices
