@@ -12,7 +12,9 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
   use rpar_indices
 
   implicit none
-
+  !$acc routine seq
+  !$acc routine(make_rates) seq
+  !$acc routine(make_ydots) seq
   integer,         intent(IN   ) :: n, ipar
   real(kind=dp_t), intent(IN   ) :: t, y(n)
   real(kind=dp_t), intent(INOUT) :: rpar(n_rpar_comps)
@@ -48,8 +50,6 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
 end subroutine rhs
 
 
-
-
 subroutine make_rates(t9,dens,y,rpar)
 
   use bl_types
@@ -59,6 +59,7 @@ subroutine make_rates(t9,dens,y,rpar)
   use rpar_indices
   
   implicit none
+  !$acc routine seq
 
   real(kind=dp_t), intent(in   ) :: t9, dens, y(nspec)
   real(kind=dp_t), intent(inout) :: rpar(n_rpar_comps)
@@ -221,6 +222,7 @@ subroutine make_ydots(ymol,t9,rpar,dydt)
   use rpar_indices
   
   implicit none
+  !$acc routine seq
 
   real(kind=dp_t), intent(IN   ) :: ymol(nspec), t9
   real(kind=dp_t), intent(INOUT) :: rpar(n_rpar_comps)
