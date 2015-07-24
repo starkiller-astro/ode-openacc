@@ -13,7 +13,7 @@ ALL: $(pnames)
 
 
 
-SRC_DIRS := . ../lapack/ ../blas/
+SRC_DIRS := . ../lapack/ ../blas/ ../boxlib/
 
 include ../GMake.common
 
