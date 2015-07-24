@@ -20,8 +20,6 @@
 !
 !  network_species_index  -- return the index of the species given its name
 !
-!  network_reaction_index -- return the index of the reaction given its name
-!
 
 module network
 
@@ -38,8 +36,6 @@ module network
   character (len= 5), save :: short_spec_names(nspec)
   character (len= 5), save :: short_aux_names(naux)
 
-  character (len=10), save :: reac_names(nrat)
-
   real(kind=dp_t), save :: aion(nspec), zion(nspec), ebin(nspec)
 
   logical, save :: network_initialized = .false.
@@ -54,7 +50,6 @@ contains
   subroutine network_init()
 
     use bl_constants_module
-    use rpar_indices
 
     real(kind=dp_t), parameter :: MeV2erg = 1.60217646e-6, &
                                   N_A = 6.0221415e23
@@ -112,25 +107,6 @@ contains
     short_spec_names(ihe4) = "He4"
     short_spec_names(ih1) = "H1"    
 
-    reac_names(irlambCNO) = "rlambdaCNO"
-    reac_names(irag15o) = "rag15o"
-    reac_names(irr1) = "rr1"
-    reac_names(irag16o) = "rag16o"
-    reac_names(irpg16o) = "rpg16o"
-    reac_names(irpg17f) = "rpg17f"
-    reac_names(irgp17f) = "rgp17f"
-    reac_names(irlambda2) = "rlambda2"
-    reac_names(irap14o) = "rap14o"
-    reac_names(irs1) = "rs1"
-    reac_names(irlambda1) = "rlambda1"
-    reac_names(ir3a) = "r3a"
-    reac_names(irpg12c) = "rpg12c"
-    reac_names(irwk14o) = "wk14o"
-    reac_names(irwk17f) = "wk17f"
-    reac_names(irwk15o) = "wk15o"
-    reac_names(irLweak) = "Lweak"
-    reac_names(irla2) = "la2"
-
     ! set the species properties
     aion(ic12) = TWELVE
     aion(io14) = 14.0_dp_t
@@ -173,11 +149,6 @@ contains
     ! done initializing
     network_initialized = .true.
 
-    ! rpar is VODE's way of passing information into the RHS and                
-    ! jacobian routines.  Here we initialize some indices to make               
-    ! sense of what is stored in the rpar() array.                              
-    call init_rpar_indices(nrat, nspec)
-
   end subroutine network_init
 
   
@@ -197,25 +168,6 @@ contains
 
     return
   end function network_species_index
-
-
-  function network_reaction_index(name)
-    
-    character(len=*) :: name
-    integer :: network_reaction_index, n
-
-    network_reaction_index = -1
-
-    do n = 1, nrat
-       if (name == reac_names(n)) then
-          network_reaction_index = n
-          exit
-       endif
-    enddo
-
-    return
-  end function network_reaction_index
-
 
   subroutine network_finalize()
 
