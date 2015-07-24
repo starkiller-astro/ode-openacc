@@ -1,0 +1,9 @@
+# executable
+ifdef ACC
+   acc_suf := .acc
+endif
+
+suf=$(FC)$(acc_suf)
+
+
+pnames = $(addsuffix .$(suf).exe, $(basename $(programs)))

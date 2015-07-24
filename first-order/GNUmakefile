@@ -3,7 +3,15 @@ FC := pgf95
 #FC := gfortran
 #FC := Cray
 
-ALL: test_react
+ACC :=
+
+include ../GMake.defs
+
+programs += test_react
+
+ALL: $(pnames)
+
+
 
 SRC_DIRS := . ../lapack/ ../blas/
 
@@ -11,8 +19,8 @@ include ../GMake.common
 
 
 # default target -- this is the executable
-test_react: $(OBJECTS)
+%.$(suf).exe: $(OBJECTS)
 	@echo " "
 	@echo "Linking..."
-	$(link) -o test_react $(OBJECTS)
+	$(link) -o $@  $(OBJECTS)
 

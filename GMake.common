@@ -7,7 +7,7 @@ vpath %.f $(SRC_DIRS)
 
 
 # odir is the directory where we put the .o and .mod files as we build
-odir := _build
+odir := _build.$(suf)
 
 
 # source files
@@ -32,8 +32,11 @@ ifeq ($(FC),gfortran)
   link := $(wrapper)
 
 else ifeq ($(FC),pgf95)
-  FFLAGS := -c -fast -acc -ta=nvidia -lcudart -mcmodel=medium -Minfo -module $(odir) -I$(odir) 
-  #FFLAGS := -c -fast -mcmodel=medium -Minfo -module $(odir) -I$(odir) 
+  ifdef ACC
+    FFLAGS := -c -fast -acc -ta=nvidia -lcudart -mcmodel=medium -Minfo -module $(odir) -I$(odir) 
+  else
+    FFLAGS := -c -fast -mcmodel=medium -Minfo -module $(odir) -I$(odir) 
+  endif
   wrapper := ftn
   link := $(wrapper) -acc -ta=nvidia
 
@@ -78,8 +81,7 @@ clean:
 	rm -f $(odir)/*.o $(odir)/*.mod *.cub *.ptx
 
 realclean: clean
-	rm -f $(odir)/deps *.cub *.ptx
-	@if [ -d $(odir) ]; then rmdir $(odir); echo "removing $(odir)"; fi
-	rm -f test_react
+	rm -rf _build* *.cub *.ptx
+	rm -f *.exe
 
 print-%: ; @echo $* is $($*)
