@@ -78,6 +78,7 @@ subroutine make_rates(t9,dens,y,rpar)
   !$acc routine( rate_p_o16_to_f17)
   !$acc routine( rate_he4_si26_to_p_p29)
   !$acc routine( rate_he4_ti44_to_p_v47)
+  !$acc routine( calc_tfactors)
   
   real(kind=dp_t), intent(in   ) :: t9, dens, y(nspec)
   real(kind=dp_t), intent(inout) :: rpar(n_rpar_comps)
