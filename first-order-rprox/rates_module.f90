@@ -25,12 +25,12 @@ module rates_module
   real (kind=dp_t), parameter :: ne19_to_f19 = exp(-3.21258d0)
   real (kind=dp_t), parameter :: o14_to_n14 = exp(-4.62412d0)
   real (kind=dp_t), parameter :: o15_to_n15 = exp(-5.1725d0)
-
+  !$acc declare copyin(f17_to_o17, ne18_to_f18, ne19_to_f19, o14_to_n14, o15_to_n15)
 
 contains
 
   function calc_tfactors(t9) result (tfactors)
-
+    !$acc routine seq
     real (kind=dp_t), intent(in   ) :: t9
     type (temp_t) :: tfactors
 
@@ -45,7 +45,7 @@ contains
 
 
   subroutine rate_p_c12_to_n13(tfactors,rate)
-
+    !$acc routine seq
     type (temp_t),    intent(in   ) :: tfactors
     real (kind=dp_t), intent(  out) :: rate
 
@@ -88,7 +88,7 @@ contains
 
 
   subroutine rate_f17_to_p_o16(tfactors,rate)
-
+    !$acc routine seq
     type (temp_t),    intent(in   ) :: tfactors
     real (kind=dp_t), intent(  out) :: rate
 
@@ -119,7 +119,7 @@ contains
 
 
   subroutine rate_f17_to_o17(tfactors,rate)
-
+    !$acc routine seq
     type (temp_t),    intent(in   ) :: tfactors
     real (kind=dp_t), intent(  out) :: rate
 
@@ -129,7 +129,7 @@ contains
 
 
   subroutine rate_p_f17_to_ne18(tfactors,rate)
-
+    !$acc routine seq
     type (temp_t),    intent(in   ) :: tfactors
     real (kind=dp_t), intent(  out) :: rate
 
@@ -175,7 +175,7 @@ contains
 
 
   subroutine rate_he4_he4_he4_to_c12(tfactors,rate)
-
+    !$acc routine seq
     type (temp_t),    intent(in   ) :: tfactors
     real (kind=dp_t), intent(  out) :: rate
 
@@ -234,7 +234,7 @@ contains
 
 
   subroutine rate_p_n14_to_o15(tfactors,rate)
-
+    !$acc routine seq
     type (temp_t),    intent(in   ) :: tfactors
     real (kind=dp_t), intent(  out) :: rate
 
@@ -290,7 +290,7 @@ contains
 
 
   subroutine rate_he4_ne18_to_p_na21(tfactors,rate)
-
+    !$acc routine seq
     type (temp_t),    intent(in   ) :: tfactors
     real (kind=dp_t), intent(  out) :: rate
 
@@ -363,7 +363,7 @@ contains
 
 
   subroutine rate_ne18_to_f18(tfactors,rate)
-
+    !$acc routine seq
     type (temp_t),    intent(in   ) :: tfactors
     real (kind=dp_t), intent(  out) :: rate
 
@@ -373,7 +373,7 @@ contains
 
 
   subroutine rate_ne19_to_f19(tfactors,rate)
-
+    !$acc routine seq
     type (temp_t),    intent(in   ) :: tfactors
     real (kind=dp_t), intent(  out) :: rate
 
@@ -383,7 +383,7 @@ contains
 
 
   subroutine rate_p_ne19_to_na20(tfactors,rate)
-
+    !$acc routine seq
     type (temp_t),    intent(in   ) :: tfactors
     real (kind=dp_t), intent(  out) :: rate
 
@@ -425,7 +425,7 @@ contains
 
 
   subroutine rate_he4_o14_to_p_f17(tfactors,rate)
-
+    !$acc routine seq
     type (temp_t),    intent(in   ) :: tfactors
     real (kind=dp_t), intent(  out) :: rate
 
@@ -489,7 +489,7 @@ contains
 
 
   subroutine rate_o14_to_n14(tfactors,rate)
-
+    !$acc routine seq
     type (temp_t),    intent(in   ) :: tfactors
     real (kind=dp_t), intent(  out) :: rate
 
@@ -499,7 +499,7 @@ contains
 
 
   subroutine rate_he4_o15_to_ne19(tfactors,rate)
-
+    !$acc routine seq
     type (temp_t),    intent(in   ) :: tfactors
     real (kind=dp_t), intent(  out) :: rate
 
@@ -546,7 +546,7 @@ contains
 
 
   subroutine rate_o15_to_n15(tfactors,rate)
-
+    !$acc routine seq
     type (temp_t),    intent(in   ) :: tfactors
     real (kind=dp_t), intent(  out) :: rate
 
@@ -556,7 +556,7 @@ contains
 
 
   subroutine rate_he4_o16_to_ne20(tfactors,rate)
-
+    !$acc routine seq
     type (temp_t),    intent(in   ) :: tfactors
     real (kind=dp_t), intent(  out) :: rate
 
@@ -605,7 +605,7 @@ contains
 
 
   subroutine rate_p_o16_to_f17(tfactors,rate)
-
+    !$acc routine seq
     type (temp_t),    intent(in   ) :: tfactors
     real (kind=dp_t), intent(  out) :: rate
 
@@ -634,7 +634,7 @@ contains
 
 
   subroutine rate_he4_si26_to_p_p29(tfactors,rate)
-
+    !$acc routine seq
     type (temp_t),    intent(in   ) :: tfactors
     real (kind=dp_t), intent(  out) :: rate
 
@@ -663,7 +663,7 @@ contains
 
 
   subroutine rate_he4_ti44_to_p_v47(tfactors,rate)
-
+    !$acc routine seq
     type (temp_t),    intent(in   ) :: tfactors
     real (kind=dp_t), intent(  out) :: rate
 
