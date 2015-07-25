@@ -70,7 +70,7 @@ module network
 
   !$acc declare copyin(ih1, ihe4, ic12, io14, io15, io16, if17, img22, is30, ini56)
   !$acc declare copyin(irlambCNO, irag15o, irr1, irag16o, irpg16o, irpg17f)
-  !$acc declare copyin(irgp17f, irpg22g, irlambda2, irap14o, irs1, irlambda1)
+  !$acc declare copyin(irgp17f, irlambda2, irap14o, irs1, irlambda1)
   !$acc declare copyin(ir3a, irpg12c, irwk14o, irwk17f, irwk15o, irLweak, irla2)
 
 contains

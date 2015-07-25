@@ -1,7 +1,7 @@
-FC := gfortran
-#FC := pgf95
+#FC := gfortran
+FC := pgf95
 
-ACC :=
+ACC := t
 
 include ../GMake.defs
 
