@@ -83,6 +83,7 @@ OBJECTS += $(addprefix $(odir)/, $(FSOURCES:.f=.o))
 
 .PHONY: clean
 
+.SECONDARY: $(OBJECTS)
 
 # targets for cleaning up
 clean:
