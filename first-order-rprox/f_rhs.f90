@@ -101,7 +101,7 @@ subroutine make_rates(t9,dens,y,rpar)
   
   rpar(irp_dlambCNOdh1:n_rpar_comps) = ZERO ! other constants
 
-  tfactors = calc_tfactors(t9)
+  call calc_tfactors(t9, tfactors)
 
   ! some common parameters
   rpar(irp_rates-1+irLweak) = Lweak
