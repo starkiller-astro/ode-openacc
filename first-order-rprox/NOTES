@@ -18,3 +18,9 @@ norm:  blas level-1: dnrm2
 
 maxtrix vector multiply: blas level-2: dgemv
 
+
+---
+
+pgi/15.7.lustre
+
+export MODULEPATH=${MODULEPATH}:/autofs/nccs-svm1_home1/norton/.modules
