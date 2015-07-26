@@ -62,7 +62,7 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
   !$acc kernels
 
   ierr = 0
-  !$acc loop gang vector reduction(max:ierr)                                  &
+  !$acc loop gang vector reduction(+:ierr)                                    &
   !$acc private(m,n,iter,I,time,dt,converged)                                 &
   !$acc private(dXdt, X1, X2, dX1dt, dX2dt, X_n, X_np1, dX, A, J, b)          &
   !$acc private(info, ipiv, rpar, ipar)
