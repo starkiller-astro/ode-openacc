@@ -38,9 +38,14 @@ else ifeq ($(FC),pgf95)
   ifdef ACC
     FFLAGS := -c -fast -acc -ta=nvidia -lcudart -mcmodel=medium -Minfo
   else
-    FFLAGS := -c -fast -mcmodel=medium -Minfo
+    FFLAGS := -c -fast -mcmodel=medium -Minfo 
   endif
   FFLAGS += -module $(odir) -I$(odir)
+
+  ifdef OMP
+    FFLAGS += -mp=nonuma -Minfo=mp
+  endif
+
   wrapper := ftn
   link := $(wrapper) -acc -ta=nvidia
 
