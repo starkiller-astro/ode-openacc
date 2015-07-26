@@ -159,6 +159,7 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
 
      Xout(:,p) = X_n(:)
   enddo
+  !$acc end kernels
   !$acc end data
 
 end subroutine react
