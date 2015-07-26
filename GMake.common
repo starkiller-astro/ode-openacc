@@ -27,16 +27,28 @@ include $(odir)/deps
 # set the compiler flags for those compilers we know about
 ifeq ($(FC),gfortran)
   FFLAGS := -c -O2 -g -fbounds-check -fbacktrace -Wuninitialized -Wunused -ffpe-trap=invalid -finit-real=nan
+
   ifdef ACC
     FFLAGS += -fopenacc
   endif
+
+  ifdef OMP
+    FFLAGS += -fopenmp
+  endif
+
   FFLAGS += -J $(odir) -I $(odir)
+
   wrapper := $(FC)
   link := $(wrapper)
 
 else ifeq ($(FC),pgf95)
+
+  wrapper := ftn
+  link := $(wrapper) 
+
   ifdef ACC
     FFLAGS := -c -fast -acc -ta=nvidia -lcudart -mcmodel=medium -Minfo
+    link += -acc -ta=nvidia
   else
     FFLAGS := -c -fast -mcmodel=medium -Minfo 
   endif
@@ -46,8 +58,7 @@ else ifeq ($(FC),pgf95)
     FFLAGS += -mp=nonuma -Minfo=mp
   endif
 
-  wrapper := ftn
-  link := $(wrapper) -acc -ta=nvidia
+
 
 else ifeq ($(FC),pgf95_local)
   ifdef ACC
