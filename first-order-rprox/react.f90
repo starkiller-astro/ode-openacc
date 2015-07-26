@@ -55,16 +55,16 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
   npts = size(T)
   ierr = 0
 
-  !$acc data copyin(Xin, T, rho, tmax, eps, tol, max_iter, ic12, io16)        &
-  !$acc copyout(Xout)                                                         &
+  !$acc data copyin(Xin, T, rho, tmax, eps, tol, max_iter)        &
+  !$acc copyout(Xout)                                             &
   !$acc copy(ierr)
 
   !$acc kernels
 
   ierr = 0
-  !$acc loop gang vector reduction(+:ierr)                                    &
-  !$acc private(m,n,iter,I,time,dt,converged)                                 &
-  !$acc private(dXdt, X1, X2, dX1dt, dX2dt, X_n, X_np1, dX, A, J, b)          &
+  !$acc loop gang vector reduction(+:ierr)                            &
+  !$acc private(m,n,iter,I,time,dt,converged)                         &
+  !$acc private(dXdt, X1, X2, dX1dt, dX2dt, X_n, X_np1, dX, A, J, b)  &
   !$acc private(info, ipiv, rpar, ipar)
   do p = 1, npts
      ! get an estimate of the timestep by looking at the RHS
