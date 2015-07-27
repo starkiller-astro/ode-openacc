@@ -5,7 +5,7 @@ program main
 
   implicit none
 
-  integer, parameter :: NPTS = 8192
+  integer, parameter :: NPTS = 32768
   real(kind=dp_t) :: Xin(nspec, NPTS), Xout(nspec, NPTS)
   real(kind=dp_t) :: rho(NPTS), temp(NPTS)
   real(kind=dp_t) :: tmax, strt, stp
