@@ -1,0 +1,45 @@
+this simply integrates a reaction network consisting of species
+equations, with no thermodynamics evolution, so we don't need an EOS
+here.
+
+
+We use LAPACK for the matrix solve.  We are using the general solve here.
+See
+
+https://software.intel.com/sites/products/documentation/doclib/mkl_sa/11/mkl_lapack_examples/dgesv_ex.f.htm
+
+for a dgesv example
+
+
+
+---
+
+norm:  blas level-1: dnrm2
+
+maxtrix vector multiply: blas level-2: dgemv
+
+
+---
+Modules that must be loaded before compiling:
+craype-accel-nvidia35 (for Cray compiler only, will also load cudatoolkit)
+cudatoolkit
+PrgEnv-pgi or PrgEnv-cray
+
+It is recommended that you swap out to the latest environment for the compiler, e.g.
+$ module swap cce/8.3.4 cce/8.3.12
+$ module swap pgi/14.2.0 pgi/15.3.0
+
+---
+Recommendations for OpenACC development based on developing this code:
+
++ Compilers have trouble with module arrays that are parameters.  Instead,
+  rewrite them as alloctable arrays and, if necessary, add an initialization
+  function.
+
++ Compilers do not like Fortran character types.  Avoid them.  Character
+  variables can be rewritten as integers to achieve the same goal.
+
++ Be wary of multiple exits (multple returns, stops, etc) in OpenACC regions.
+
++ Avoid write or print statements in OpenACC regions.
+
