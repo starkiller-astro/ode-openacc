@@ -6,7 +6,6 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
    use bl_constants_module
 
    implicit none
-   !!$acc routine(rhs) seq
    !$acc routine(dgesv) seq
    
    ! do a simple first-order backward Euler method for integrating
@@ -72,12 +71,7 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
    !$acc copyout(Xout)                                                         &
    !$acc copy(ierr)
 
-   !!$acc parallel default(none)                                               &
-   !!$acc kernels default(none)                                                 
    !$acc kernels
-   !!$acc private(m,n,iter,I,time,dt,converged)                                 &
-   !!$acc private(dXdt, X1, X2, dX1dt, dX2dt, X_n, X_np1, dX, A, J, b)          &
-   !!$acc private(info, ipiv, rpar, ipar)                                       
 
    ierr = 0 
    !$acc loop gang vector reduction(max:ierr)                                  &
@@ -190,9 +184,7 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
 
       Xout(:,p) = X_n(:)
    enddo
-   !!$omp end parallel do
 
-   !!$acc end parallel
    !$acc end kernels
    !$acc end data
 
