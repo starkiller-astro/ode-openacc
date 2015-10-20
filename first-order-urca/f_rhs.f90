@@ -79,8 +79,8 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
   capture_rate = 0.1_dp_t
   decay_rate   = 0.2_dp_t
 
-  ydot(ine23_) = -decay_rate*y(ine23_) + capture_rate*y(ina23_)*aion(ine23_)/aion(ina23_)
-  ydot(ina23_) = -capture_rate*y(ina23_) + decay_rate*y(ine23_)*aion(ina23_)/aion(ine23_)
+  ydot(ine23_) = -decay_rate*y(ine23_) + capture_rate*y(ina23_) 
+  ydot(ina23_) = -capture_rate*y(ina23_) + decay_rate*y(ine23_) 
 
   return
 
