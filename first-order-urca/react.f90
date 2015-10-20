@@ -47,17 +47,11 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
 
    integer :: ipiv(nspec)
 
-   integer :: ic12, io16
-
    real(kind=dp_t) :: tol = 1.d-6
    integer :: max_iter = 10
    integer :: iter, npts, p
    logical :: converged
   
-   !ic12 = network_species_index("carbon-12")
-   !io16 = network_species_index("oxygen-16")
-   ic12 = ic12_
-   io16 = io16_
    npts = size(T)
    ierr = 0 
    allocate(scratch(npts))
@@ -92,7 +86,6 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
       ! dt = min{X/(dX/dt)}
       rpar(irp_dens) = rho(p)
       rpar(irp_temp) = T(p)
-      rpar(irp_o16) = Xin(io16,p)
 
       X_n(:) = Xin(:,p)
       
@@ -102,7 +95,7 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
 
 
       dt = 1.d33
-      dt = 0.1*min(dt, abs(Xin(ic12,p)/dXdt(ic12)))
+      dt = 0.1*min(dt, abs(Xin(ine23_,p)/dXdt(ine23_)), abs(Xin(ina23_,p)/dXdt(ina23_)))
       
       !print *, p, ': dt = ', dt
 
@@ -183,6 +176,8 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
          if (time + dt > tmax) then
             dt = tmax - time
          endif
+
+         print *, time, '  ', X_n(ine23_), '  ', X_n(ina23_)
 
          X_n(:) = X_np1(:)
          time = time + dt

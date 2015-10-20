@@ -7,10 +7,9 @@ module network_indices
 
   implicit none
 
-  integer, parameter :: ic12_ = 1
-  integer, parameter :: io16_ = 2
-  integer, parameter :: img24_ = 3
-  !$acc declare copyin(ic12_, io16_, img24_)
+  integer, parameter :: ine23_ = 1
+  integer, parameter :: ina23_ = 2
+  !$acc declare copyin(ine23_, ina23_)
 
 end module network_indices
 
@@ -18,11 +17,10 @@ module rpar_indices
 
   implicit none
 
-  integer, parameter :: n_rpar_comps = 3
+  integer, parameter :: n_rpar_comps = 2
 
   integer, parameter :: irp_dens = 1
   integer, parameter :: irp_temp = 2
-  integer, parameter :: irp_o16  = 3
-  !$acc declare copyin(n_rpar_comps, irp_dens, irp_temp, irp_o16)
+  !$acc declare copyin(n_rpar_comps, irp_dens, irp_temp)
 
 end module rpar_indices

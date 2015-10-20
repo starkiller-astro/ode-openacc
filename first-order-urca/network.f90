@@ -24,13 +24,13 @@ module network
 
   implicit none
 
-  character (len=*), parameter :: network_name = "ignition_simple"
+  character (len=*), parameter :: network_name = "urca_simple"
 
   ! nspec = number of species this network carries
   ! nspec_advance = the number of species that are explicitly integrated
   !                 in the ODE solve (the others are solved for 
   !                 algebraically).
-  integer, parameter :: nspec = 3
+  integer, parameter :: nspec = 2
   integer, parameter :: nspec_advance = 1
   integer, parameter :: naux  = 0
   !$acc declare copyin(nspec, nspec_advance, naux)
@@ -57,39 +57,34 @@ contains
   subroutine network_init()
     allocate(spec_names(nspec))
     spec_names = [& 
-    "carbon-12       ",&
-    "oxygen-16       ",&
-    "magnesium-24    "]
+    "neon-23         ",&
+    "sodium-23       "]
     !!$acc update device(spec_names)
 
     allocate(short_spec_names(nspec))
     short_spec_names = [&
-    "C12  ",&
-    "O16  ",&
-    "Mg24 "]
+    "Ne23  ",&
+    "Na23  "]
     !!$acc update device(short_spec_names)
 
     allocate(aion(nspec))
     aion = [&
-    12.0_dp_t,&
-    16.0_dp_t,&
-    24.0_dp_t]
+    23.0_dp_t,&
+    23.0_dp_t]
     !$acc update device(aion)
     !!$acc enter data copyin(aion)
 
     allocate(zion(nspec))
     zion = [&
-    6.0_dp_t,& 
-    8.0_dp_t,& 
-    12.0_dp_t]
+    10.0_dp_t,& 
+    11.0_dp_t]
     !$acc update device(zion)
     !!$acc enter data copyin(zion)
 
     allocate(ebin(nspec))
     ebin = [&
-    -7.4103097e18_dp_t,&     !  92.16294 MeV
-    -7.6959672e18_dp_t,&     ! 127.62093 MeV
-    -7.9704080e18_dp_t]      ! 198.2579  MeV
+    -3.33911e17_dp_t,&     ! Ne23
+    -3.40538e17_dp_t]      ! Na23
     !$acc update device(ebin)
     !!$acc enter data copyin(ebin)
   end subroutine network_init
