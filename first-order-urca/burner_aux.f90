@@ -22,7 +22,7 @@ module rpar_indices
   integer, parameter :: irp_dens = 1
   integer, parameter :: irp_temp = 2
   integer, parameter :: irp_mu_elec = 3
-  !$acc declare copyin(n_rpar_comps, irp_dens, irp_temp)
+  !$acc declare copyin(n_rpar_comps, irp_dens, irp_temp, irp_mu_elec)
 
 end module rpar_indices
 
@@ -35,5 +35,6 @@ module phase_par_indices
   integer, parameter  ::  iqn   = 1 
   integer, parameter  ::  itemp = 2
   integer, parameter  ::  ieta  = 3
+  !$acc declare copyin(n_phase_par_inds, iqn, itemp, ieta)
 
 end module phase_par_indices

@@ -5,6 +5,8 @@ module integration
   contains 
 
     function gauss_legendre_5(f, fpars) result(igral)
+      !$acc routine seq
+      !$acc routine(f) seq
       ! Do 5-pt Gauss Legendre integration
       ! Weight function is w(x) = 1
 
@@ -34,6 +36,8 @@ module integration
     end function gauss_legendre_5
 
     function gauss_laguerre_5(f, fpars) result(igral)
+      !$acc routine seq
+      !$acc routine(f) seq
       ! Do 5-pt Gauss Laguerre integration
       ! Weight function is w(x) = x^0 * exp(-x)
 

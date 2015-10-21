@@ -177,7 +177,7 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
             dt = tmax - time
          endif
 
-         print *, time, '  ', X_n(ine23_), '  ', X_n(ina23_)
+         !print *, time, '  ', X_n(ine23_), '  ', X_n(ina23_)
 
          X_n(:) = X_np1(:)
          time = time + dt

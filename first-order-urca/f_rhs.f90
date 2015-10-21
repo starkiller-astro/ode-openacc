@@ -38,7 +38,7 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
 
   implicit none
   !$acc routine seq
-  !$acc routine(screenz) seq
+  !!$acc routine(screenz) seq ! For now, I don't use screenz
 
   ! our convention is that y(1:nspec) are the species (in the same
   ! order as defined in network.f90, and y(nspec+1) is the temperature
@@ -64,6 +64,7 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
 
   interface 
     function rate_capture_na23(rpar) result(lambda)
+      !$acc routine seq
       use bl_types
       real(kind=dp_t)                :: lambda
       real(kind=dp_t), intent(inout) :: rpar(:)
@@ -72,6 +73,7 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
 
   interface 
     function rate_emission_ne23(rpar) result(lambda)
+      !$acc routine seq
       use bl_types
       real(kind=dp_t)                :: lambda
       real(kind=dp_t), intent(inout) :: rpar(:)
@@ -110,6 +112,8 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
 end subroutine rhs
 
 function rate_emission_ne23(rpar) result (lambda)
+  !$acc routine seq
+  !$acc routine(gauss_legendre_5) seq
   ! Compute the beta emission rate of Ne-23 given density, temp, and electron
   ! fermi energy. For now, assumes gs->gs transition.
   use bl_constants_module
@@ -129,6 +133,7 @@ function rate_emission_ne23(rpar) result (lambda)
  
   interface 
     function phase_emission_ne23(v, fpar) result(phi)
+      !$acc routine seq
       import dp_t
       real(kind=dp_t), intent(in) :: v
       real(kind=dp_t) ::  phi
@@ -149,6 +154,7 @@ function rate_emission_ne23(rpar) result (lambda)
 end function rate_emission_ne23
 
 function phase_emission_ne23(v, fpar) result (phi)
+  !$acc routine seq
   ! w is the mass+kinetic energy in units of mc^2
   ! v is related to w via a linear transformation for emission phase
   ! v is the integration variable to scale the limits to [-1,1]
@@ -166,6 +172,7 @@ function phase_emission_ne23(v, fpar) result (phi)
  
   interface
     function gzw(inuc,w) result(g)
+      !$acc routine seq
       import dp_t
       real(kind=dp_t)               :: g
       real(kind=dp_t), intent(in)   :: w
@@ -182,6 +189,8 @@ function phase_emission_ne23(v, fpar) result (phi)
 end function phase_emission_ne23
 
 function rate_capture_na23(rpar) result (lambda)
+  !$acc routine seq
+  !$acc routine(gauss_laguerre_5) seq
   ! Compute the beta capture rate of Na-23 given density, temp, and electron
   ! fermi energy. For now, assumes gs->gs transition.
   use physical_constants_module
@@ -201,6 +210,7 @@ function rate_capture_na23(rpar) result (lambda)
  
   interface 
     function phase_capture_na23(v, fpar) result(phi)
+      !$acc routine seq
       import dp_t
       real(kind=dp_t) :: v, phi
       real(kind=dp_t) :: fpar(:)
@@ -221,6 +231,7 @@ function rate_capture_na23(rpar) result (lambda)
 end function rate_capture_na23
 
 function phase_capture_na23(v, fpar) result (phi)
+  !$acc routine seq
   ! w is the mass+kinetic energy in units of mc^2
   ! v is related to w via a linear transformation for capture phase
   ! v is the integration variable to scale the limits to [0,Infinity]
@@ -239,6 +250,7 @@ function phase_capture_na23(v, fpar) result (phi)
 
   interface
     function gzw(inuc,w) result(g)
+      !$acc routine seq
       import dp_t
       real(kind=dp_t)               :: g
       real(kind=dp_t), intent(in)   :: w
@@ -260,6 +272,7 @@ function phase_capture_na23(v, fpar) result (phi)
 end function phase_capture_na23
 
 function gzw(inuc,w) result(g)
+  !$acc routine seq
   ! Calculate the G(Z,w) factor (Eq. 5a-5b of FFN 1980)
   ! Signs are chosen for electron emission and capture
   use network
@@ -282,5 +295,5 @@ function gzw(inuc,w) result(g)
   r = (2.908d-3)*a**(THIRD) - (2.437d0)*a**(-THIRD)
 
   ! For now, use the non-relativistic approximation for gzw (doesn't use s)
-  g = exp(-2.0d0*M_PI*abs(x))*2.0d0*M_PI*ALPHA_CONST*z !(2.0d0*ALPHA_CONST*z*r)**(-(ALPHA_CONST*z)**2)
+  g = exp(-2.0d0*M_PI*abs(x))*2.0d0*M_PI*ALPHA_CONST*z*(2.0d0*ALPHA_CONST*z*r)**(-(ALPHA_CONST*z)**2)
 end function gzw
