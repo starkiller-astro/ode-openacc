@@ -53,13 +53,30 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
   !real(kind=dp_t) :: dens
   !real(kind=dp_t) :: temp, T9, T9a, dT9dt, dT9adt
 
-  real(kind=dp_t) :: capture_rate, decay_rate
+  real(kind=dp_t) ::  mu_elec
+  real(kind=dp_t) ::  capture_rate, emission_rate
 
   real(kind=dp_t), PARAMETER :: &
                      one_twelvth = 1.0d0/12.0d0, &
                      five_sixths = 5.0d0/ 6.0d0, &
                        one_third = 1.0d0/ 3.0d0, &
                       two_thirds = 2.0d0/ 3.0d0
+
+  interface 
+    function rate_capture_na23(rpar) result(lambda)
+      use bl_types
+      real(kind=dp_t)                :: lambda
+      real(kind=dp_t), intent(inout) :: rpar(:)
+    end function rate_capture_na23
+  end interface
+
+  interface 
+    function rate_emission_ne23(rpar) result(lambda)
+      use bl_types
+      real(kind=dp_t)                :: lambda
+      real(kind=dp_t), intent(inout) :: rpar(:)
+    end function rate_emission_ne23
+  end interface
 
   !dens = rpar(irp_dens)
   !temp = rpar(irp_temp)
@@ -76,14 +93,194 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
   !T9a    = T9/(1.0e0_dp_t + 0.0396e0_dp_t*T9)
   !dT9adt = (T9a / T9 - (T9a / (1.0e0_dp_t + 0.0396e0_dp_t*T9)) * 0.0396e0_dp_t) * dT9dt
 
-  capture_rate = 0.1_dp_t
-  decay_rate   = 0.2_dp_t
+  ! mu_elec = 1.0/(sum_i z_i * x_i * y_i / a_i)
+  ! y_i: ionization fraction (assume y_i = 1 below)
+  mu_elec = 1.0d0/(zion(ine23_)*y(ine23_)/aion(ine23_) + &
+                  zion(ina23_)*y(ina23_)/aion(ina23_))
+  rpar(irp_mu_elec) = mu_elec
 
-  ydot(ine23_) = -decay_rate*y(ine23_) + capture_rate*y(ina23_) 
-  ydot(ina23_) = -capture_rate*y(ina23_) + decay_rate*y(ine23_) 
+  capture_rate  = rate_capture_na23(rpar)
+  emission_rate = rate_emission_ne23(rpar)
+
+  ydot(ine23_) = -emission_rate*y(ine23_) + capture_rate*y(ina23_) 
+  ydot(ina23_) = -capture_rate*y(ina23_) + emission_rate*y(ine23_) 
 
   return
 
 end subroutine rhs
 
+function rate_emission_ne23(rpar) result (lambda)
+  ! Compute the beta emission rate of Ne-23 given density, temp, and electron
+  ! fermi energy. For now, assumes gs->gs transition.
+  use bl_constants_module
+  use physical_constants_module
+  use rpar_indices 
+  use network_indices
+  use phase_par_indices
+  use integration
 
+  implicit none
+
+  real(kind=dp_t)                :: lambda
+  real(kind=dp_t), intent(in)    :: rpar(:)
+  real(kind=dp_t)                :: fpar(n_phase_par_inds)
+  real(kind=dp_t), parameter     :: ft = 1.0d0 ! placeholder value
+  real(kind=dp_t)                :: g, ufermi, kt, phi
+ 
+  interface 
+    function phase_emission_ne23(v, fpar) result(phi)
+      import dp_t
+      real(kind=dp_t), intent(in) :: v
+      real(kind=dp_t) ::  phi
+      real(kind=dp_t), intent(in) :: fpar(:)
+    end function phase_emission_ne23
+  end interface
+
+  ! assuming gs->gs so E_i = E_j = 0
+  fpar(iqn)   = (MASS_NE23_CONST-MASS_NA23_CONST)*MEV_PER_AMU_CONST/MELEC_CONST
+  fpar(itemp) = rpar(irp_temp)
+  
+  ! placeholder approx eta for T->0, need to get it from EOS (Eq. 4c, FFN 1980)
+  ufermi = 0.5d-2*(rpar(irp_dens)/rpar(irp_mu_elec))**THIRD
+  kt     = KBOLT_CONST*rpar(irp_temp)
+  fpar(ieta)  = ufermi/kt
+  lambda = log(2.0d0)*gauss_legendre_5(phase_emission_ne23, fpar)/ft
+
+end function rate_emission_ne23
+
+function phase_emission_ne23(v, fpar) result (phi)
+  ! w is the mass+kinetic energy in units of mc^2
+  ! v is related to w via a linear transformation for emission phase
+  ! v is the integration variable to scale the limits to [-1,1]
+  ! w = 1 + (v + 1)*(qn - 1)/2
+  use phase_par_indices
+  use network_indices
+  use physical_constants_module
+
+  implicit none
+
+  real(kind=dp_t), intent(in) :: v
+  real(kind=dp_t), intent(in) :: fpar(n_phase_par_inds)
+  real(kind=dp_t) ::  w, g, s, z
+  real(kind=dp_t) ::  phi
+ 
+  interface
+    function gzw(inuc,w) result(g)
+      import dp_t
+      real(kind=dp_t)               :: g
+      real(kind=dp_t), intent(in)   :: w
+      integer, intent(in)           :: inuc
+    end function gzw
+  end interface
+
+  w = 1.0d0 + (v + 1.0d0)*(fpar(iqn) - 1.0d0)/2.0d0
+  g = gzw(ina23_,w)
+  z = MELEC_CONST/(KBOLT_CONST*fpar(itemp))
+  s = 1.0d0/(1.0d0 + exp((w-1.0d0)*z-fpar(ieta)))
+  phi = w**2*(fpar(iqn) - w)**2*g*(1.0d0-s)
+
+end function phase_emission_ne23
+
+function rate_capture_na23(rpar) result (lambda)
+  ! Compute the beta capture rate of Na-23 given density, temp, and electron
+  ! fermi energy. For now, assumes gs->gs transition.
+  use physical_constants_module
+  use bl_constants_module
+  use rpar_indices 
+  use network_indices
+  use phase_par_indices
+  use integration
+
+  implicit none
+
+  real(kind=dp_t)                :: lambda
+  real(kind=dp_t), intent(in)    :: rpar(:)
+  real(kind=dp_t)                :: fpar(n_phase_par_inds)
+  real(kind=dp_t), parameter     :: ft = 1.0d0 ! placeholder value
+  real(kind=dp_t)                :: g, ufermi, kt, phi
+ 
+  interface 
+    function phase_capture_na23(v, fpar) result(phi)
+      import dp_t
+      real(kind=dp_t) :: v, phi
+      real(kind=dp_t) :: fpar(:)
+    end function phase_capture_na23
+  end interface
+
+  ! assuming gs->gs so E_i = E_j = 0
+  fpar(iqn)   = (MASS_NA23_CONST-MASS_NE23_CONST)*MEV_PER_AMU_CONST/MELEC_CONST
+  
+  fpar(itemp) = rpar(irp_temp)
+  
+  ! placeholder approx eta for T->0, need to get it from EOS (Eq. 4c, FFN 1980)
+  ufermi = 0.5d-2*(rpar(irp_dens)/rpar(irp_mu_elec))**THIRD
+  kt     = KBOLT_CONST*rpar(irp_temp)
+  fpar(ieta)  = ufermi/kt
+  lambda = log(2.0d0)*gauss_laguerre_5(phase_capture_na23, fpar)/ft
+
+end function rate_capture_na23
+
+function phase_capture_na23(v, fpar) result (phi)
+  ! w is the mass+kinetic energy in units of mc^2
+  ! v is related to w via a linear transformation for capture phase
+  ! v is the integration variable to scale the limits to [0,Infinity]
+  ! w = v + wl, wl = 1 (for qn > -1), wl = abs(qn) (for qn < -1)
+  use bl_types
+  use phase_par_indices
+  use network_indices
+  use physical_constants_module
+
+  implicit none
+
+  real(kind=dp_t), intent(in) ::  v 
+  real(kind=dp_t), intent(in) :: fpar(n_phase_par_inds)
+  real(kind=dp_t) ::  w, wl, g, s, z
+  real(kind=dp_t) ::  phi
+
+  interface
+    function gzw(inuc,w) result(g)
+      import dp_t
+      real(kind=dp_t)               :: g
+      real(kind=dp_t), intent(in)   :: w
+      integer, intent(in)           :: inuc
+    end function gzw
+  end interface
+
+  if (fpar(iqn) <= -1.0d0) then
+    wl = abs(fpar(iqn))
+  else
+    wl = 1.0d0
+  end if
+  w = v + wl
+  g = gzw(ina23_,w)
+  z = MELEC_CONST/(KBOLT_CONST*fpar(itemp))
+  s = 1.0d0/(1.0d0 + exp((w-1.0d0)*z-fpar(ieta)))
+  phi = w**2*(fpar(iqn) + w)**2*g*s
+
+end function phase_capture_na23
+
+function gzw(inuc,w) result(g)
+  ! Calculate the G(Z,w) factor (Eq. 5a-5b of FFN 1980)
+  ! Signs are chosen for electron emission and capture
+  use network
+  use bl_constants_module
+  use physical_constants_module
+
+  implicit none
+
+  real(kind=dp_t)               :: g
+  real(kind=dp_t), intent(in)   :: w
+  integer, intent(in)           :: inuc
+
+  real(kind=dp_t)               :: p, f, s, x, z, r, a
+  
+  p = sqrt(w**2 - 1.0d0)
+  z = zion(inuc)
+  s = sqrt(1.0d0 - (ALPHA_CONST*z)**2) ! I'll need this for the general case
+  x = ALPHA_CONST*z*w/p
+  a = aion(inuc)
+  r = (2.908d-3)*a**(THIRD) - (2.437d0)*a**(-THIRD)
+
+  ! For now, use the non-relativistic approximation for gzw (doesn't use s)
+  g = exp(-2.0d0*M_PI*abs(x))*2.0d0*M_PI*ALPHA_CONST*z !(2.0d0*ALPHA_CONST*z*r)**(-(ALPHA_CONST*z)**2)
+end function gzw
