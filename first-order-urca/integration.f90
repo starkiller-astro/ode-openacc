@@ -15,7 +15,7 @@ module integration_module
     0.568888888888889d0, &
     0.478628670499366d0, &
     0.236926885056189d0 /)
-  !$acc declare create(gauss_legendre_5pt_xk, gauss_legendre_5pt_wk)
+  !$acc declare copyin(gauss_legendre_5pt_xk, gauss_legendre_5pt_wk)
   real(kind=dp_t), parameter, dimension(5) :: gauss_laguerre_5pt_xk = (/ &
     0.263560319718141d0, &
     0.141340305910652d1, &
@@ -28,6 +28,6 @@ module integration_module
     0.759424496817076d-1, &
     0.361175867992205d-2, &
     0.233699723857762d-4 /)
-  !$acc declare create(gauss_laguerre_5pt_xk, gauss_laguerre_5pt_wk)
+  !$acc declare copyin(gauss_laguerre_5pt_xk, gauss_laguerre_5pt_wk)
 
 end module integration_module

@@ -66,7 +66,7 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
       !$acc routine seq
       use bl_types
       real(kind=dp_t)                :: lambda
-      real(kind=dp_t), dimension(:), intent(in) :: rpar
+      real(kind=dp_t), dimension(*), intent(in) :: rpar
     end function rate_capture_na23
   end interface
 
@@ -75,7 +75,7 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
       !$acc routine seq
       use bl_types
       real(kind=dp_t)                :: lambda
-      real(kind=dp_t), dimension(:), intent(in) :: rpar
+      real(kind=dp_t), dimension(*), intent(in) :: rpar
     end function rate_emission_ne23
   end interface
 
@@ -123,7 +123,7 @@ function rate_emission_ne23(rpar) result (lambda)
   implicit none
 
   real(kind=dp_t)                :: lambda
-  real(kind=dp_t), dimension(:), intent(in)    :: rpar
+  real(kind=dp_t), dimension(*), intent(in)    :: rpar
   real(kind=dp_t), dimension(n_phase_par_inds)  :: fpar
   real(kind=dp_t), parameter     :: ft = 1.0d0 ! placeholder value
   real(kind=dp_t)                :: ufermi, kt
@@ -133,7 +133,7 @@ function rate_emission_ne23(rpar) result (lambda)
       !$acc routine seq
       import dp_t
       real(kind=dp_t) :: igral
-      real(kind=dp_t), dimension(:), intent(in) :: fpar
+      real(kind=dp_t), dimension(*), intent(in) :: fpar
     end function gauss_legendre_5pt_emission
   end interface
 
@@ -162,7 +162,7 @@ function phase_emission_ne23(v, fpar) result (phi)
   implicit none
 
   real(kind=dp_t), intent(in) :: v
-  real(kind=dp_t), dimension(:), intent(in) :: fpar
+  real(kind=dp_t), dimension(*), intent(in) :: fpar
   real(kind=dp_t) ::  w, g, s, z
   real(kind=dp_t) ::  phi
  
@@ -202,7 +202,7 @@ function gauss_legendre_5pt_emission(fpar) result(igral)
       import dp_t
       real(kind=dp_t), intent(in) :: v
       real(kind=dp_t) ::  phi
-      real(kind=dp_t), dimension(:), intent(in) :: fpar
+      real(kind=dp_t), dimension(*), intent(in) :: fpar
     end function phase_emission_ne23
   end interface
 
@@ -228,7 +228,7 @@ function rate_capture_na23(rpar) result (lambda)
   implicit none
 
   real(kind=dp_t)                :: lambda
-  real(kind=dp_t), dimension(:), intent(in)    :: rpar
+  real(kind=dp_t), dimension(*), intent(in)    :: rpar
   real(kind=dp_t), dimension(n_phase_par_inds)  :: fpar
   real(kind=dp_t), parameter     :: ft = 1.0d0 ! placeholder value
   real(kind=dp_t)                :: ufermi, kt
@@ -238,7 +238,7 @@ function rate_capture_na23(rpar) result (lambda)
       !$acc routine seq
       import dp_t
       real(kind=dp_t) :: igral
-      real(kind=dp_t), dimension(:), intent(in) :: fpar
+      real(kind=dp_t), dimension(*), intent(in) :: fpar
     end function gauss_laguerre_5pt_capture
   end interface
 
@@ -269,7 +269,7 @@ function phase_capture_na23(v, fpar) result (phi)
   implicit none
 
   real(kind=dp_t), intent(in) ::  v 
-  real(kind=dp_t), dimension(:), intent(in) :: fpar
+  real(kind=dp_t), dimension(*), intent(in) :: fpar
   real(kind=dp_t) ::  w, wl, g, s, z
   real(kind=dp_t) ::  phi
 
@@ -305,7 +305,7 @@ function gauss_laguerre_5pt_capture(fpar) result(igral)
   
   integer, parameter :: N=5
   real(kind=dp_t) :: igral, wkj, xkj
-  real(kind=dp_t), dimension(:), intent(in) :: fpar
+  real(kind=dp_t), dimension(*), intent(in) :: fpar
   integer :: j
 
   interface 
@@ -314,7 +314,7 @@ function gauss_laguerre_5pt_capture(fpar) result(igral)
       import dp_t
       real(kind=dp_t), intent(in) :: v
       real(kind=dp_t) ::  phi
-      real(kind=dp_t), dimension(:), intent(in) :: fpar
+      real(kind=dp_t), dimension(*), intent(in) :: fpar
     end function phase_capture_na23
   end interface
 
