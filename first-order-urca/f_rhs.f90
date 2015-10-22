@@ -207,13 +207,11 @@ function gauss_legendre_5pt_emission(fpar) result(igral)
   end interface
 
   igral = 0.0d0
-  !$acc data present(gauss_legendre_5pt_xk, gauss_legendre_5pt_wk)
   do j=1,N
     wkj = gauss_legendre_5pt_wk(j)
     xkj = gauss_legendre_5pt_xk(j)
     igral = igral + wkj*phase_emission_ne23(xkj, fpar)
   end do
-  !$acc end data
   return
 end function gauss_legendre_5pt_emission
 
@@ -321,13 +319,11 @@ function gauss_laguerre_5pt_capture(fpar) result(igral)
   end interface
 
   igral = 0.0d0
-  !$acc data present(gauss_laguerre_5pt_xk, gauss_laguerre_5pt_wk)
   do j=1,N
     wkj = gauss_laguerre_5pt_wk(j)
     xkj = gauss_laguerre_5pt_xk(j)
     igral = igral + wkj*phase_capture_na23(xkj, fpar)*exp(xkj)
   end do
-  !$acc end data
   return
 end function gauss_laguerre_5pt_capture
 
