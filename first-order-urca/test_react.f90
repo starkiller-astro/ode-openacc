@@ -43,13 +43,13 @@ program main
   rho(:) = 2.6e9
   tmax = 1000.0
 
-  print *, 'time=end, space_index=100            Ne-23               Na-23'
-  print *, Xout(:,100)
 
   call cpu_time(strt)
   call react(Xin, temp, rho, tmax, Xout, ierr)
   call cpu_time(stp)
 
+  print *, 'time=end, space_index=1            Ne-23               Na-23'
+  print *, Xout(:,1)
   print *, ierr
   !print *, Xout(:,1)
   print *, 'runtime: ', stp - strt, ' seconds'

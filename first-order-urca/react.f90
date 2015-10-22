@@ -35,7 +35,7 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
      
    real(kind=dp_t) :: dXdt(nspec)
    real(kind=dp_t) :: X1(nspec), X2(nspec), dX1dt(nspec), dX2dt(nspec)
-   real(kind=dp_t) :: X_n(nspec), X_np1(nspec), dX(nspec), dfdX(nspec)
+   real(kind=dp_t) :: X_n(nspec), X_np1(nspec), dX(nspec)
    real(kind=dp_t) :: A(nspec, nspec), J(nspec, nspec), b(nspec)
    real(kind=dp_t), allocatable :: scratch(:)
    integer :: info

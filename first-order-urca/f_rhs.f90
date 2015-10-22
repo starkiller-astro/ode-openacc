@@ -47,7 +47,6 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
   real(kind=dp_t), intent(  out) :: ydot(n)
   real(kind=dp_t), intent(inout) :: rpar(:)
 
-  integer :: k
 !  real(kind=dp_t) :: ymass(nspec)
 
   !real(kind=dp_t) :: dens
@@ -67,7 +66,7 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
       !$acc routine seq
       use bl_types
       real(kind=dp_t)                :: lambda
-      real(kind=dp_t), intent(inout) :: rpar(:)
+      real(kind=dp_t), dimension(:), intent(in) :: rpar
     end function rate_capture_na23
   end interface
 
@@ -76,7 +75,7 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
       !$acc routine seq
       use bl_types
       real(kind=dp_t)                :: lambda
-      real(kind=dp_t), intent(inout) :: rpar(:)
+      real(kind=dp_t), dimension(:), intent(in) :: rpar
     end function rate_emission_ne23
   end interface
 
@@ -113,7 +112,6 @@ end subroutine rhs
 
 function rate_emission_ne23(rpar) result (lambda)
   !$acc routine seq
-  !$acc routine(gauss_legendre_5) seq
   ! Compute the beta emission rate of Ne-23 given density, temp, and electron
   ! fermi energy. For now, assumes gs->gs transition.
   use bl_constants_module
@@ -121,24 +119,22 @@ function rate_emission_ne23(rpar) result (lambda)
   use rpar_indices 
   use network_indices
   use phase_par_indices
-  use integration
 
   implicit none
 
   real(kind=dp_t)                :: lambda
-  real(kind=dp_t), intent(in)    :: rpar(:)
-  real(kind=dp_t)                :: fpar(n_phase_par_inds)
+  real(kind=dp_t), dimension(:), intent(in)    :: rpar
+  real(kind=dp_t), dimension(n_phase_par_inds)  :: fpar
   real(kind=dp_t), parameter     :: ft = 1.0d0 ! placeholder value
-  real(kind=dp_t)                :: g, ufermi, kt, phi
+  real(kind=dp_t)                :: ufermi, kt
  
   interface 
-    function phase_emission_ne23(v, fpar) result(phi)
+    function gauss_legendre_5pt_emission(fpar) result(igral)
       !$acc routine seq
       import dp_t
-      real(kind=dp_t), intent(in) :: v
-      real(kind=dp_t) ::  phi
-      real(kind=dp_t), intent(in) :: fpar(:)
-    end function phase_emission_ne23
+      real(kind=dp_t) :: igral
+      real(kind=dp_t), dimension(:), intent(in) :: fpar
+    end function gauss_legendre_5pt_emission
   end interface
 
   ! assuming gs->gs so E_i = E_j = 0
@@ -149,7 +145,7 @@ function rate_emission_ne23(rpar) result (lambda)
   ufermi = 0.5d-2*(rpar(irp_dens)/rpar(irp_mu_elec))**THIRD
   kt     = KBOLT_CONST*rpar(irp_temp)
   fpar(ieta)  = ufermi/kt
-  lambda = log(2.0d0)*gauss_legendre_5(phase_emission_ne23, fpar)/ft
+  lambda = log(2.0d0)*gauss_legendre_5pt_emission(fpar)/ft
 
 end function rate_emission_ne23
 
@@ -166,7 +162,7 @@ function phase_emission_ne23(v, fpar) result (phi)
   implicit none
 
   real(kind=dp_t), intent(in) :: v
-  real(kind=dp_t), intent(in) :: fpar(n_phase_par_inds)
+  real(kind=dp_t), dimension(:), intent(in) :: fpar
   real(kind=dp_t) ::  w, g, s, z
   real(kind=dp_t) ::  phi
  
@@ -188,9 +184,39 @@ function phase_emission_ne23(v, fpar) result (phi)
 
 end function phase_emission_ne23
 
+function gauss_legendre_5pt_emission(fpar) result(igral)
+  !$acc routine seq
+  ! Do 5-pt Gauss Legendre integration
+  ! Weight function is w(x) = 1
+  use bl_types
+  use integration_module
+
+  real(kind=dp_t) :: igral, xkj, wkj
+  real(kind=dp_t), intent(in) :: fpar(:)
+  integer :: j
+  integer, parameter  ::  N=5
+
+  interface 
+    function phase_emission_ne23(v, fpar) result(phi)
+      !$acc routine seq
+      import dp_t
+      real(kind=dp_t), intent(in) :: v
+      real(kind=dp_t) ::  phi
+      real(kind=dp_t), dimension(:), intent(in) :: fpar
+    end function phase_emission_ne23
+  end interface
+
+  igral = 0.0d0
+  do j=1,N
+    wkj = gauss_legendre_5pt_wk(j)
+    xkj = gauss_legendre_5pt_xk(j)
+    igral = igral + wkj*phase_emission_ne23(xkj, fpar)
+  end do
+  return
+end function gauss_legendre_5pt_emission
+
 function rate_capture_na23(rpar) result (lambda)
   !$acc routine seq
-  !$acc routine(gauss_laguerre_5) seq
   ! Compute the beta capture rate of Na-23 given density, temp, and electron
   ! fermi energy. For now, assumes gs->gs transition.
   use physical_constants_module
@@ -198,23 +224,22 @@ function rate_capture_na23(rpar) result (lambda)
   use rpar_indices 
   use network_indices
   use phase_par_indices
-  use integration
 
   implicit none
 
   real(kind=dp_t)                :: lambda
-  real(kind=dp_t), intent(in)    :: rpar(:)
-  real(kind=dp_t)                :: fpar(n_phase_par_inds)
+  real(kind=dp_t), dimension(:), intent(in)    :: rpar
+  real(kind=dp_t), dimension(n_phase_par_inds)  :: fpar
   real(kind=dp_t), parameter     :: ft = 1.0d0 ! placeholder value
-  real(kind=dp_t)                :: g, ufermi, kt, phi
+  real(kind=dp_t)                :: ufermi, kt
  
   interface 
-    function phase_capture_na23(v, fpar) result(phi)
+    function gauss_laguerre_5pt_capture(fpar) result(igral)
       !$acc routine seq
       import dp_t
-      real(kind=dp_t) :: v, phi
-      real(kind=dp_t) :: fpar(:)
-    end function phase_capture_na23
+      real(kind=dp_t) :: igral
+      real(kind=dp_t), dimension(:), intent(in) :: fpar
+    end function gauss_laguerre_5pt_capture
   end interface
 
   ! assuming gs->gs so E_i = E_j = 0
@@ -226,7 +251,7 @@ function rate_capture_na23(rpar) result (lambda)
   ufermi = 0.5d-2*(rpar(irp_dens)/rpar(irp_mu_elec))**THIRD
   kt     = KBOLT_CONST*rpar(irp_temp)
   fpar(ieta)  = ufermi/kt
-  lambda = log(2.0d0)*gauss_laguerre_5(phase_capture_na23, fpar)/ft
+  lambda = log(2.0d0)*gauss_laguerre_5pt_capture(fpar)/ft
 
 end function rate_capture_na23
 
@@ -244,7 +269,7 @@ function phase_capture_na23(v, fpar) result (phi)
   implicit none
 
   real(kind=dp_t), intent(in) ::  v 
-  real(kind=dp_t), intent(in) :: fpar(n_phase_par_inds)
+  real(kind=dp_t), dimension(:), intent(in) :: fpar
   real(kind=dp_t) ::  w, wl, g, s, z
   real(kind=dp_t) ::  phi
 
@@ -271,6 +296,37 @@ function phase_capture_na23(v, fpar) result (phi)
 
 end function phase_capture_na23
 
+function gauss_laguerre_5pt_capture(fpar) result(igral)
+  !$acc routine seq
+  ! Do 5-pt Gauss Laguerre integration
+  ! Weight function is w(x) = x^0 * exp(-x)
+  use bl_types
+  use integration_module
+  
+  integer, parameter :: N=5
+  real(kind=dp_t) :: igral, wkj, xkj
+  real(kind=dp_t), dimension(:), intent(in) :: fpar
+  integer :: j
+
+  interface 
+    function phase_capture_na23(v, fpar) result(phi)
+      !$acc routine seq
+      import dp_t
+      real(kind=dp_t), intent(in) :: v
+      real(kind=dp_t) ::  phi
+      real(kind=dp_t), dimension(:), intent(in) :: fpar
+    end function phase_capture_na23
+  end interface
+
+  igral = 0.0d0
+  do j=1,N
+    wkj = gauss_laguerre_5pt_wk(j)
+    xkj = gauss_laguerre_5pt_xk(j)
+    igral = igral + wkj*phase_capture_na23(xkj, fpar)*exp(xkj)
+  end do
+  return
+end function gauss_laguerre_5pt_capture
+
 function gzw(inuc,w) result(g)
   !$acc routine seq
   ! Calculate the G(Z,w) factor (Eq. 5a-5b of FFN 1980)
@@ -284,16 +340,33 @@ function gzw(inuc,w) result(g)
   real(kind=dp_t)               :: g
   real(kind=dp_t), intent(in)   :: w
   integer, intent(in)           :: inuc
+  real(kind=dp_t)               :: p, s, x, z, r, a
 
-  real(kind=dp_t)               :: p, f, s, x, z, r, a
+  ! Parameters for RMS ground state nuclear charge radii
+  ! From ADNDT 2013, Eq. 8
+  real(kind=dp_t), parameter    ::  r0 = 0.9071 ! fm
+  real(kind=dp_t), parameter    ::  r1 = 1.105  ! fm
+  real(kind=dp_t), parameter    ::  r2 = -0.548 ! fm
+  ! r for FFN 1980 is in electron compton wavelengths
+  ! From PDG 2014
+  real(kind=dp_t), parameter    ::  lambda_elec_div_2pi = 3.8615926800d2  ! fm
   
   p = sqrt(w**2 - 1.0d0)
   z = zion(inuc)
   s = sqrt(1.0d0 - (ALPHA_CONST*z)**2) ! I'll need this for the general case
   x = ALPHA_CONST*z*w/p
   a = aion(inuc)
-  r = (2.908d-3)*a**(THIRD) - (2.437d0)*a**(-THIRD)
 
+  !print *,'a: ',a
+  !r = (2.908d-3)*a**(THIRD) - (2.437d0)*a**(-THIRD) ! From FFN 1980, this gives a negative r
+  !print *,'r: ',r
+
+  ! Calculate rms nuclear charge radius in units of electron compton wavelength
+  r = ((r0 + r1/a**(TWO3RD) + r2/a**(FOUR3RD))*a**(THIRD))/(2.0d0*M_PI*lambda_elec_div_2pi)
+  !print *,'r: ',r
+
+  
   ! For now, use the non-relativistic approximation for gzw (doesn't use s)
   g = exp(-2.0d0*M_PI*abs(x))*2.0d0*M_PI*ALPHA_CONST*z*(2.0d0*ALPHA_CONST*z*r)**(-(ALPHA_CONST*z)**2)
+  !print *,'g: ',g
 end function gzw
