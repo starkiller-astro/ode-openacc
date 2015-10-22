@@ -62,7 +62,7 @@ subroutine react(Xin, T, rho, tmax, Xout, ierr)
    !Note: print statements don't play nice with GPUs, so
    !      they're commented out.
 
-   !$acc data copyin(Xin, T, rho, tmax, eps, tol, max_iter, ic12, io16)        &
+   !$acc data copyin(Xin, T, rho, tmax, eps, tol, max_iter)        &
    !$acc copyout(Xout)                                                         &
    !$acc copy(ierr)
 

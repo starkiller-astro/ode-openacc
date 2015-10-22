@@ -45,7 +45,7 @@ program main
   ! burn
   temp(:) = 8.e8
   rho(:) = 2.6e9
-  tmax = 1000.0
+  tmax = 10.0
 
 
   call cpu_time(strt)
