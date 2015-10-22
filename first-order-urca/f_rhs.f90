@@ -189,10 +189,10 @@ function gauss_legendre_5pt_emission(fpar) result(igral)
   ! Do 5-pt Gauss Legendre integration
   ! Weight function is w(x) = 1
   use bl_types
-  use integration_module
+  use integration
 
   real(kind=dp_t) :: igral, xkj, wkj
-  real(kind=dp_t), intent(in) :: fpar(:)
+  real(kind=dp_t), dimension(*), intent(in) :: fpar
   integer :: j
   integer, parameter  ::  N=5
 
@@ -301,7 +301,7 @@ function gauss_laguerre_5pt_capture(fpar) result(igral)
   ! Do 5-pt Gauss Laguerre integration
   ! Weight function is w(x) = x^0 * exp(-x)
   use bl_types
-  use integration_module
+  use integration
   
   integer, parameter :: N=5
   real(kind=dp_t) :: igral, wkj, xkj
