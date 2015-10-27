@@ -5,10 +5,10 @@ module integration
 
   real(kind=dp_t), allocatable :: gauss_legendre_5pt_xk(:)
   real(kind=dp_t), allocatable :: gauss_legendre_5pt_wk(:)
-  !$acc declare link(gauss_legendre_5pt_xk, gauss_legendre_5pt_wk)
+  !$acc declare create(gauss_legendre_5pt_xk, gauss_legendre_5pt_wk)
   real(kind=dp_t), allocatable :: gauss_laguerre_5pt_xk(:)
   real(kind=dp_t), allocatable :: gauss_laguerre_5pt_wk(:)
-  !$acc declare link(gauss_laguerre_5pt_xk, gauss_laguerre_5pt_wk)
+  !$acc declare create(gauss_laguerre_5pt_xk, gauss_laguerre_5pt_wk)
 
   contains
     subroutine integration_init()
