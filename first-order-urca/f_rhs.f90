@@ -186,6 +186,7 @@ end function phase_emission_ne23
 
 function gauss_legendre_5pt_emission(fpar) result(igral)
   !$acc routine seq
+  !$acc data present(gauss_legendre_5pt_xk, gauss_legendre_5pt_wk)
   ! Do 5-pt Gauss Legendre integration
   ! Weight function is w(x) = 1
   use bl_types
@@ -208,13 +209,12 @@ function gauss_legendre_5pt_emission(fpar) result(igral)
 
   igral = 0.0d0
   do j=1,N
-    !$acc data present(gauss_legendre_5pt_xk, gauss_legendre_5pt_wk)
     wkj = gauss_legendre_5pt_wk(j)
     xkj = gauss_legendre_5pt_xk(j)
-    !$acc end data
     igral = igral + wkj*phase_emission_ne23(xkj, fpar)
   end do
   return
+  !$acc end data
 end function gauss_legendre_5pt_emission
 
 function rate_capture_na23(rpar) result (lambda)
@@ -300,6 +300,7 @@ end function phase_capture_na23
 
 function gauss_laguerre_5pt_capture(fpar) result(igral)
   !$acc routine seq
+  !$acc data present(gauss_laguerre_5pt_xk, gauss_laguerre_5pt_wk)
   ! Do 5-pt Gauss Laguerre integration
   ! Weight function is w(x) = x^0 * exp(-x)
   use bl_types
@@ -322,13 +323,12 @@ function gauss_laguerre_5pt_capture(fpar) result(igral)
 
   igral = 0.0d0
   do j=1,N
-    !$acc data present(gauss_laguerre_5pt_xk, gauss_laguerre_5pt_wk)
     wkj = gauss_laguerre_5pt_wk(j)
     xkj = gauss_laguerre_5pt_xk(j)
-    !$acc end data
     igral = igral + wkj*phase_capture_na23(xkj, fpar)*exp(xkj)
   end do
   return
+  !$acc end data
 end function gauss_laguerre_5pt_capture
 
 function gzw(inuc,w) result(g)
