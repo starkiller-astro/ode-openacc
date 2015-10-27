@@ -1,6 +1,7 @@
 program main
 
   use network
+  !use integration
   use bl_types
 
   implicit none
@@ -30,6 +31,9 @@ program main
   
   ! initialize the network
   call network_init()
+
+  ! initialize integration arrays
+  !call integration_init() ! Takes a long time copying data every call to f_rhs
 
   ! setup the composition
   ine23 = network_species_index("neon-23")
