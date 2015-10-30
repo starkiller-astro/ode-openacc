@@ -26,7 +26,8 @@ include $(odir)/deps
 
 # set the compiler flags for those compilers we know about
 ifeq ($(FC),gfortran)
-  FFLAGS := -c -O2 -g -fbounds-check -fbacktrace -Wuninitialized -Wunused -ffpe-trap=invalid -finit-real=nan
+  #FFLAGS := -c -O2 -g -fbounds-check -fbacktrace -Wuninitialized -Wunused -ffpe-trap=invalid -finit-real=nan
+  FFLAGS := -c -O2 -g -fbounds-check -fbacktrace -Wuninitialized -Wunused -ffpe-trap=invalid,zero,overflow,underflow -finit-real=snan
 
   ifdef ACC
     FFLAGS += -fopenacc
