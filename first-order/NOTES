@@ -33,13 +33,13 @@ $ module swap pgi/14.2.0 pgi/15.3.0
 Recommendations for OpenACC development based on developing this code:
 
 + Compilers have trouble with module arrays that are parameters.  Instead,
-  rewrite them as alloctable arrays and, if necessary, add an initialization
+  rewrite them as allocatable arrays and, if necessary, add an initialization
   function.
 
 + Compilers do not like Fortran character types.  Avoid them.  Character
   variables can be rewritten as integers to achieve the same goal.
 
-+ Be wary of multiple exits (multple returns, stops, etc) in OpenACC regions.
++ Be wary of multiple exits (multiple returns, stops, etc) in OpenACC regions.
 
 + Avoid write or print statements in OpenACC regions.
 
