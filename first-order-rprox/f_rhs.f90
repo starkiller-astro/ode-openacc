@@ -12,7 +12,9 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
   use rpar_indices
 
   implicit none
-
+  !$acc routine seq
+  !$acc routine(make_rates) seq
+  !$acc routine(make_ydots) seq
   integer,         intent(IN   ) :: n, ipar
   real(kind=dp_t), intent(IN   ) :: t, y(n)
   real(kind=dp_t), intent(INOUT) :: rpar(n_rpar_comps)
@@ -33,12 +35,11 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
 
   ymol = y(1:nspec)/aion(1:nspec)
 
-
   ! build the rates; weak rates are the wk* variables
   call make_rates(t9, dens, ymol, rpar)
 
   ! set up the ODEs
-  call make_ydots(ymol,t9,rpar,ydot(1:nspec),.false.)
+  call make_ydots(ymol,t9,rpar,ydot(1:nspec))
 
   ! make them in terms of mass fractions
   ! dX/dt = dX/dY dY/dt
@@ -47,8 +48,6 @@ subroutine rhs(n, t, y, ydot, rpar, ipar)
   return
 
 end subroutine rhs
-
-
 
 
 subroutine make_rates(t9,dens,y,rpar)
@@ -60,7 +59,27 @@ subroutine make_rates(t9,dens,y,rpar)
   use rpar_indices
   
   implicit none
-
+  !$acc routine seq
+  !$acc routine( rate_p_c12_to_n13)
+  !$acc routine( rate_f17_to_p_o16)
+  !$acc routine( rate_f17_to_o17)
+  !$acc routine( rate_p_f17_to_ne18)
+  !$acc routine( rate_he4_he4_he4_to_c12)
+  !$acc routine( rate_p_n14_to_o15)
+  !$acc routine( rate_he4_ne18_to_p_na21)
+  !$acc routine( rate_ne18_to_f18)
+  !$acc routine( rate_ne19_to_f19)
+  !$acc routine( rate_p_ne19_to_na20)
+  !$acc routine( rate_he4_o14_to_p_f17)
+  !$acc routine( rate_o14_to_n14)
+  !$acc routine( rate_he4_o15_to_ne19)
+  !$acc routine( rate_o15_to_n15)
+  !$acc routine( rate_he4_o16_to_ne20)
+  !$acc routine( rate_p_o16_to_f17)
+  !$acc routine( rate_he4_si26_to_p_p29)
+  !$acc routine( rate_he4_ti44_to_p_v47)
+  !$acc routine( calc_tfactors)
+  
   real(kind=dp_t), intent(in   ) :: t9, dens, y(nspec)
   real(kind=dp_t), intent(inout) :: rpar(n_rpar_comps)
 
@@ -82,7 +101,7 @@ subroutine make_rates(t9,dens,y,rpar)
   
   rpar(irp_dlambCNOdh1:n_rpar_comps) = ZERO ! other constants
 
-  tfactors = calc_tfactors(t9)
+  call calc_tfactors(t9, tfactors)
 
   ! some common parameters
   rpar(irp_rates-1+irLweak) = Lweak
@@ -222,6 +241,7 @@ subroutine make_ydots(ymol,t9,rpar,dydt)
   use rpar_indices
   
   implicit none
+  !$acc routine seq
 
   real(kind=dp_t), intent(IN   ) :: ymol(nspec), t9
   real(kind=dp_t), intent(INOUT) :: rpar(n_rpar_comps)

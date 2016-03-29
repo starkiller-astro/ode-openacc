@@ -10,6 +10,16 @@ https://software.intel.com/sites/products/documentation/doclib/mkl_sa/11/mkl_lap
 
 for a dgesv example
 
+---
+Brief overview of files
+
+GNUMakefile:    make instructions
+test_react.f90: main driver, test the reaction code
+react.f90:      main reaction algorithm
+f_rhs.f90:      the right hand side of the ODE system
+screen.f90:     calculate the Coulomb screening for the reactions
+burner_aux.f90: metadata for the burner
+network.f90:    metadata for the network
 
 
 ---
@@ -21,7 +31,7 @@ maxtrix vector multiply: blas level-2: dgemv
 
 ---
 Modules that must be loaded before compiling:
-craype-accel-nvidia35 (for Cray compiler only)
+craype-accel-nvidia35 (for Cray compiler only, will also load cudatoolkit)
 cudatoolkit
 PrgEnv-pgi or PrgEnv-cray
 
