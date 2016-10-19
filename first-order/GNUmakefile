@@ -1,5 +1,5 @@
-FC := pgf95
-#FC := pgf95_local
+FC := pgf95_local
+#FC := pgf95
 #FC := gfortran
 #FC := Cray
 
